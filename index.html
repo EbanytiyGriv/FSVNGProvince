@@ -502,17 +502,18 @@
   </div>
 </section>
 
+<!-- ЕДИНСТВЕННЫЙ И ЧИСТЫЙ ФУТЕР ЦЕНТРИРОВАННЫЙ -->
 <footer style="background-color: #111111; padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid #222;">
   <div class="footer-content" style="max-width: 1200px; margin: 0 auto; text-align: center; color: #aaaaaa; font-size: 13px; line-height: 1.6;">
     
-    <!-- Центральный блок: Информация о сообществе -->
+    <!-- Информация о сообществе -->
     <p style="margin: 0 0 6px 0; color: #cccccc;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
     <p style="margin: 0 0 20px 0; color: #666666; font-size: 12px;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
     
-    <!-- Тонкая разделительная линия между блоками -->
+    <!-- Тонкая разделительная линия -->
     <div style="width: 60px; height: 1px; background-color: #333; margin: 0 auto 20px auto;"></div>
 
-    <!-- Нижний блок: Копирайт и интерактивная ссылка -->
+    <!-- Копирайт и интерактивная ссылка -->
     <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 14px; color: #ffffff; letter-spacing: 0.5px;">
       © <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.
     </p>
@@ -525,21 +526,20 @@
   </div>
 </footer>
 
-<!-- Стили для плавного и заметного высветления ссылки при наведении -->
+<!-- Стили для ссылки (плавное высветление до белого) -->
 <style>
   .footer-wiki-link {
     color: #888888; 
     text-decoration: none;
     transition: color 0.25s ease;
   }
-  /* При наведении ссылка становится белой и подчеркивается */
   .footer-wiki-link:hover {
     color: #ffffff !important;
     text-decoration: underline !important;
   }
 </style>
 
-<!-- Все ваши JS-скрипты, включая автоматическую дату -->
+<!-- Все ваши JS-скрипты -->
 <script>
   // Автоматическое обновление текущего года в футере
   const yearSpan = document.getElementById('currentYear');
