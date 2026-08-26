@@ -502,71 +502,40 @@
   </div>
 </section>
 
-<footer>
-  <p>ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
-  <p>Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
-<footer>
-  <div class="footer-content" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
-    <!-- Левый угол с вашими правами и ссылкой -->
-    <div class="footer-left" style="text-align: left;">
-      <p style="margin: 0 0 5px 0;">© <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.</p>
-      <p style="margin: 0;">
-        <a href="https://fandom.com" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.</a>
-      </p>
-    </div>
-
-    <!-- Правый угол с вашим изначальным текстом -->
-    <div class="footer-right" style="text-align: right;">
-      <p style="margin: 0 0 5px 0;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
-      <p style="margin: 0;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
-    </div>
-  </div>
 <footer style="background-color: #111111; padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid #222;">
-  <div class="footer-content" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; max-width: 1200px; margin: 0 auto;">
+  <div class="footer-content" style="max-width: 1200px; margin: 0 auto; text-align: center; color: #aaaaaa; font-size: 13px; line-height: 1.6;">
     
-    <!-- ЛЕВЫЙ УГОЛ (Копирайт и ссылка на Вики) -->
-    <div class="footer-left" style="text-align: left; color: #ffffff; flex: 1; min-width: 300px;">
-      <p style="margin: 0 0 8px 0; font-weight: bold; font-size: 14px; letter-spacing: 0.5px;">
-        © <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.
-      </p>
-      <p style="margin: 0; font-size: 13px; line-height: 1.4;">
-        <a href="https://fandom.com" target="_blank" rel="noopener" class="footer-wiki-link">
-          В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
-        </a>
-      </p>
-    </div>
+    <!-- Центральный блок: Информация о сообществе -->
+    <p style="margin: 0 0 6px 0; color: #cccccc;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
+    <p style="margin: 0 0 20px 0; color: #666666; font-size: 12px;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
+    
+    <!-- Тонкая разделительная линия между блоками -->
+    <div style="width: 60px; height: 1px; background-color: #333; margin: 0 auto 20px auto;"></div>
 
-    <!-- ПРАВЫЙ УГОЛ (Информация о сообществе) -->
-    <div class="footer-right" style="text-align: right; color: #aaaaaa; flex: 1; min-width: 300px; font-size: 13px; line-height: 1.4;">
-      <p style="margin: 0 0 8px 0;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
-      <p style="margin: 0; color: #666666; font-size: 12px;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
-    </div>
+    <!-- Нижний блок: Копирайт и интерактивная ссылка -->
+    <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 14px; color: #ffffff; letter-spacing: 0.5px;">
+      © <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.
+    </p>
+    <p style="margin: 0;">
+      <a href="https://fandom.com" target="_blank" rel="noopener" class="footer-wiki-link">
+        В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
+      </a>
+    </p>
 
   </div>
 </footer>
 
-<!-- Стили для интерактивных элементов футера -->
+<!-- Стили для плавного и заметного высветления ссылки при наведении -->
 <style>
   .footer-wiki-link {
-    color: #58a6ff; 
+    color: #888888; 
     text-decoration: none;
-    transition: color 0.2s ease, text-decoration 0.2s ease;
+    transition: color 0.25s ease;
   }
+  /* При наведении ссылка становится белой и подчеркивается */
   .footer-wiki-link:hover {
-    color: #79c0ff;
-    text-decoration: underline;
-  }
-  
-  /* Адаптация под мобильные экраны: на телефонах углы встанут друг под друга */
-  @media (max-width: 768px) {
-    .footer-content {
-      flex-direction: column !important;
-      align-items: center !important;
-      text-align: center !important;
-    }
-    .footer-left, .footer-right {
-      text-align: center !important;
-    }
+    color: #ffffff !important;
+    text-decoration: underline !important;
   }
 </style>
 
