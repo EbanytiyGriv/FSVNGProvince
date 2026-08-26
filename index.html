@@ -506,7 +506,7 @@
   
   <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
     <p style="margin: 0 0 4px 0;">ФСВНГ — ролевое игровое сообщество. Данный ресурс является любительским и не связан с реальными государственными или военными структурами.</p>
-<p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
+    <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
   </div>
 
   <!-- Тонкая разделительная линия на всю ширину -->
@@ -515,10 +515,11 @@
   <div class="footer-bottom-row" style="display: flex; justify-content: flex-start; max-width: 1200px; margin: 0 auto; padding-left: 15%;">
     
     <div class="footer-left-block" style="text-align: left; color: #888888; font-size: 12px; line-height: 1.5; max-width: 70%;">
-      <p style="margin: 0 0 4px 0;">© <span id="currentYear">2026</span> Федеральная Служба Войск Национальной Гвардии по г. Провинция. Все права защищены.</p>
+      <p style="margin: 0 0 4px 0;">© <span id="currentYear">2026</span> Федеральная служба войск национальной гвардии по г. Провинция. Все права защищены.</p>
       <p style="margin: 0;">
         <a href="https://funbaze.fandom.com/ru/wiki/%D0%A4%D0%A1%D0%92%D0%9D%D0%93" target="_blank" rel="noopener" class="custom-wiki-link">
           В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
+        </a>
       </p>
     </div>
 
@@ -549,7 +550,6 @@
 </style>
 
 <script>
-
   const yearSpan = document.getElementById('currentYear');
   if (yearSpan) {
     yearSpan.textContent = new Date().getFullYear();
@@ -569,7 +569,7 @@
       const dist = Math.hypot(dx, dy);
 
       if (dist < RECOIL_RADIUS) {
-        const k = 1 - dist / RECOIL_RADIUS; // 0 → 1 as cursor gets closer
+        const k = 1 - dist / RECOIL_RADIUS; 
         const rotY = (dx / RECOIL_RADIUS) * 22 * k;
         const rotX = 26 * k - (dy / RECOIL_RADIUS) * 8 * k;
         const depth = -90 * k;
@@ -616,6 +616,3 @@
   }, { threshold: .15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
-
-</body>
-</html>
