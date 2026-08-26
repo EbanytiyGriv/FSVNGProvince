@@ -502,40 +502,55 @@
   </div>
 </section>
 
-<!-- ЕДИНСТВЕННЫЙ И ЧИСТЫЙ ФУТЕР ЦЕНТРИРОВАННЫЙ -->
 <footer style="background-color: #111111; padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid #222;">
-  <div class="footer-content" style="max-width: 1200px; margin: 0 auto; text-align: center; color: #aaaaaa; font-size: 13px; line-height: 1.6;">
-    
-    <!-- Информация о сообществе -->
-    <p style="margin: 0 0 6px 0; color: #cccccc;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
-    <p style="margin: 0 0 20px 0; color: #666666; font-size: 12px;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
-    
-    <!-- Тонкая разделительная линия -->
-    <div style="width: 60px; height: 1px; background-color: #333; margin: 0 auto 20px auto;"></div>
+  
+  <!-- ВЕРХНЯЯ ЧАСТЬ: Строго по центру -->
+  <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
+    <p style="margin: 0 0 4px 0;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
+    <p style="margin: 0; color: #555555; font-size: 12px;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
+  </div>
 
-    <!-- Копирайт и интерактивная ссылка -->
-    <p style="margin: 0 0 6px 0; font-weight: bold; font-size: 14px; color: #ffffff; letter-spacing: 0.5px;">
-      © <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.
-    </p>
-    <p style="margin: 0;">
-      <a href="https://fandom.com" target="_blank" rel="noopener" class="footer-wiki-link">
-        В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
-      </a>
-    </p>
+  <!-- Тонкая разделительная линия на всю ширину -->
+  <div style="width: 100%; height: 1px; background-color: #222; margin-bottom: 25px;"></div>
+
+  <!-- НИЖНЯЯ ЧАСТЬ: Сдвинутый к центру левый блок (правый угол пустой) -->
+  <div class="footer-bottom-row" style="display: flex; justify-content: flex-start; max-width: 1200px; margin: 0 auto; padding-left: 15%;">
+    
+    <!-- Сдвинутый блок: Копирайт и интерактивная ссылка -->
+    <div class="footer-left-block" style="text-align: left; color: #888888; font-size: 12px; line-height: 1.5; max-width: 70%;">
+      <p style="margin: 0 0 4px 0;">© <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.</p>
+      <p style="margin: 0;">
+        <a href="https://fandom.com" target="_blank" rel="noopener" class="custom-wiki-link">
+          В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
+        </a>
+      </p>
+    </div>
 
   </div>
 </footer>
 
-<!-- Стили для ссылки (плавное высветление до белого) -->
+<!-- Стили для плавного высветления ссылки при наведении -->
 <style>
-  .footer-wiki-link {
-    color: #888888; 
+  .custom-wiki-link {
+    color: #666666; 
     text-decoration: none;
     transition: color 0.25s ease;
   }
-  .footer-wiki-link:hover {
+  .custom-wiki-link:hover {
     color: #ffffff !important;
     text-decoration: underline !important;
+  }
+  
+  /* Мобильная адаптация */
+  @media (max-width: 768px) {
+    .footer-bottom-row {
+      padding-left: 0 !important;
+      justify-content: center !important;
+    }
+    .footer-left-block {
+      max-width: 100% !important;
+      text-align: center !important;
+    }
   }
 </style>
 
