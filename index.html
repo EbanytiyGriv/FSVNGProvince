@@ -505,10 +505,30 @@
 <footer>
   <p>ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
   <p>Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
+<footer>
+  <div class="footer-content" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+    <!-- Левый угол с вашими правами и ссылкой -->
+    <div class="footer-left" style="text-align: left;">
+      <p style="margin: 0 0 5px 0;">© <span id="currentYear">2026</span> Название_Вашего_Сайта. Все права защищены.</p>
+      <p style="margin: 0;">
+        <a href="https://fandom.com" target="_blank" rel="noopener" style="text-decoration: none; color: inherit;">В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.</a>
+      </p>
+    </div>
+
+    <!-- Правый угол с вашим изначальным текстом -->
+    <div class="footer-right" style="text-align: right;">
+      <p style="margin: 0 0 5px 0;">ФСВНГ — ролевое игровое сообщество. Не имеет отношения к реальным государственным структурам.</p>
+      <p style="margin: 0;">Адреса подключения указаны в качестве примера — замените на актуальные перед публикацией.</p>
+    </div>
+  </div>
 </footer>
 
 <script>
-  // title leans back in 3D as the cursor approaches
+  const yearSpan = document.getElementById('currentYear');
+  if (yearSpan) {
+    yearSpan.textContent = new Date().getFullYear();
+  }
+
   const dodgeTitle = document.getElementById('dodgeTitle');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const RECOIL_RADIUS = 160;
