@@ -43,16 +43,16 @@
 
   a{ color: inherit; }
 
-  /* ---------- page transition (Набор) ---------- */
-  body.recruit-open{ overflow: hidden; }
-  .page-main, .page-recruit{
+  /* ---------- page transitions (Набор / Досье) ---------- */
+  body.recruit-open, body.staff-open{ overflow: hidden; }
+  .page-main, .page-recruit, .page-staff{
     position: relative;
     width: 100%;
     transition: transform .6s cubic-bezier(.2,.7,.2,1);
     will-change: transform;
   }
   .page-main{ transform: translateX(0); }
-  .page-recruit{
+  .page-recruit, .page-staff{
     position: fixed; top:0; left:0; width:100%; height: 100vh; z-index: 60;
     background: var(--bg);
     transform: translateX(100%);
@@ -64,8 +64,10 @@
     display:flex; align-items:center; justify-content:center;
     text-align:center; padding: 40px 20px;
   }
-  body.recruit-open .page-main{ transform: translateX(-100%); }
+  body.recruit-open .page-main,
+  body.staff-open .page-main{ transform: translateX(-100%); }
   body.recruit-open .page-recruit{ transform: translateX(0); }
+  body.staff-open .page-staff{ transform: translateX(0); }
 
   .recruit-back{
     position: absolute; top: 24px; right: 28px;
@@ -73,6 +75,7 @@
     text-transform: uppercase; color: var(--khaki-dim); background: none;
     border: 1px solid var(--line); padding: 9px 16px; cursor: pointer;
     transition: color .15s, border-color .15s;
+    z-index: 2;
   }
   .recruit-back:hover{ color: var(--bone); border-color: var(--khaki-dim); }
 
@@ -259,7 +262,7 @@
     transition: background .15s, color .15s, border-color .15s;
   }
   .copy-btn:hover{ background: var(--amber); color: #14150e; border-color: var(--amber); }
-  .copy-btn:focus-visible, .dossier-btn:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
+  .copy-btn:focus-visible, .dossier-btn:focus-visible, .staff-row:focus-visible{ outline: 2px solid var(--amber); outline-offset: 2px; }
 
   .dossier-btn{
     font-family: var(--font-mono); font-size:.7rem; letter-spacing:.2em;
@@ -269,7 +272,7 @@
   }
   .dossier-btn:hover{ color: var(--bone); border-color: var(--bone); }
 
-  /* back face — dossier */
+  /* back face — dossier (unit cards) */
   .unit-face.back{ padding: 26px 30px; justify-content: space-between; }
   .dossier-head{ display:flex; align-items:baseline; justify-content: space-between; }
   .dossier-head .unit-name{ font-family: var(--font-display); font-size:1.3rem; text-transform:uppercase; color: var(--bone); }
@@ -282,14 +285,60 @@
   .staff-list{ display:flex; flex-direction:column; border-top: 1px solid var(--line); }
   .staff-row{
     display:flex; align-items:center; justify-content: space-between;
-    gap: 20px; padding: 18px 4px; border-bottom: 1px solid var(--line);
+    gap: 20px; padding: 18px 10px; border-bottom: 1px solid var(--line);
+    cursor: pointer; background: transparent;
+    transition: background .18s ease, padding-left .18s ease;
   }
+  .staff-row:hover, .staff-row:focus-visible{
+    background: var(--panel);
+    padding-left: 16px;
+  }
+  .staff-row:hover .staff-name, .staff-row:focus-visible .staff-name{ color: var(--amber); }
+  .staff-row .staff-arrow{
+    font-family: var(--font-mono); font-size: .78rem; color: var(--khaki-dim);
+    opacity: 0; transform: translateX(-4px);
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .staff-row:hover .staff-arrow, .staff-row:focus-visible .staff-arrow{ opacity: 1; transform: translateX(0); }
   .staff-role{
     font-family: var(--font-mono); font-size:.7rem; letter-spacing:.2em;
     text-transform: uppercase; color: var(--khaki-dim);
   }
-  .staff-name{ font-family: var(--font-display); font-size: 1.05rem; letter-spacing:.02em; color: var(--bone); text-transform: uppercase; }
-  .staff-row.template .staff-name, .staff-row.template .staff-role{ color: var(--khaki-dim); font-style: italic; }
+  .staff-name{
+    font-family: var(--font-display); font-size: 1.05rem; letter-spacing:.02em;
+    color: var(--bone); text-transform: uppercase; transition: color .18s ease;
+    margin-left: auto; margin-right: 12px;
+  }
+
+  /* ================= DOSSIER (staff detail page) ================= */
+  .dossier-person{
+    flex: 1;
+    display:flex; align-items:stretch; justify-content:center;
+    max-width: 980px; margin: 0 auto; width: 100%;
+    padding: 90px 20px 60px; gap: 50px;
+  }
+  .dossier-photo{
+    flex: none; width: 300px; align-self: flex-start;
+    border: 1px solid var(--line); background: var(--panel);
+    aspect-ratio: 3 / 4; overflow: hidden;
+  }
+  .dossier-photo img{ width:100%; height:100%; object-fit: cover; display:block; }
+  .dossier-info{ flex: 1; min-width: 0; padding-top: 6px; }
+  .dossier-info .staff-role{ font-size: .74rem; }
+  .dossier-info .dossier-name{
+    font-family: var(--font-display); font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+    text-transform: uppercase; letter-spacing:.02em; color: var(--bone);
+    margin-top: 10px; margin-bottom: 26px;
+  }
+  .dossier-info .dossier-bio-text{
+    color: var(--khaki); font-size: .96rem; max-width: 560px;
+    white-space: pre-line;
+  }
+
+  @media (max-width: 720px){
+    .dossier-person{ flex-direction: column; padding-top: 80px; gap: 26px; }
+    .dossier-photo{ width: 180px; }
+  }
 
   /* ================= FOOTER ================= */
   footer{
@@ -308,7 +357,8 @@
     .unit-face.front{ flex-direction: column; }
     .unit-tab{ width:100%; flex-direction:row; padding: 16px; gap: 12px; border-right:none; border-bottom:1px solid var(--line); }
     .nav{ gap: 22px; font-size:.66rem; }
-    .staff-row{ flex-direction: column; align-items:flex-start; gap: 4px; }
+    .staff-row{ flex-wrap: wrap; gap: 4px; }
+    .staff-name{ margin-left: 0; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -535,18 +585,11 @@
   <div class="section-head reveal">
     <div class="section-eyebrow">Руководство · разработка</div>
     <h2 class="section-title">Состав руководства</h2>
-    <p class="section-desc">Ответственные за портал и координацию подразделений.</p>
+    <p class="section-desc">Ответственные за портал и координацию подразделений. Нажмите на имя, чтобы открыть личное дело.</p>
   </div>
 
-  <div class="staff-list">
-    <div class="staff-row reveal"><span class="staff-role">Нач. УФСВНГ</span><span class="staff-name">Дорофеев</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Ком. СОБР «Рысь»</span><span class="staff-name">Костров А.А.</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Ком. ОСН "Гром"</span><span class="staff-name">Нестеров Л. А.</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Нач. ОВО</span><span class="staff-name">Сабуров С. А.</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Нач. ОРЛС</span><span class="staff-name">Кестарев И. А.</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Ком. ОМОН "Гранит"</span><span class="staff-name">Рубинов М. К.</span></div>
-    <div class="staff-row reveal"><span class="staff-role">Разработчик сайта</span><span class="staff-name">Павлов Д. А.</span></div>
-  </div>
+  <!-- Список строится автоматически из массива staffData в конце файла -->
+  <div class="staff-list" id="staffList"></div>
 </section>
 
 <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
@@ -600,6 +643,28 @@
           </a>
         </p>
       </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ================= ДОСЬЕ СОТРУДНИКА (открывается по клику на ФИО) ================= -->
+<div class="page-staff" id="pageStaff">
+  <button class="recruit-back" id="staffBackBtn">← Назад</button>
+
+  <div class="dossier-person">
+    <div class="dossier-photo">
+      <img id="staffPhoto" src="" alt="">
+    </div>
+    <div class="dossier-info">
+      <div class="staff-role" id="staffRole"></div>
+      <h2 class="dossier-name" id="staffName"></h2>
+      <p class="dossier-bio-text" id="staffBioText"></p>
+    </div>
+  </div>
+
+  <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
+    <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6;">
+      <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
     </div>
   </footer>
 </div>
@@ -690,7 +755,7 @@
     });
   });
 
-  // dossier flip
+  // dossier flip (unit cards)
   document.querySelectorAll('.dossier-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-target');
@@ -706,6 +771,155 @@
     });
   }, { threshold: .15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ==========================================================================
+     СОСТАВ РУКОВОДСТВА — ДОБАВЛЕНИЕ НОВОГО ЧЕЛОВЕКА
+     ==========================================================================
+     Всё руководство описано ниже, в массиве staffData. Каждая запись — это
+     один человек: должность, ФИО, ссылка (URL) на фото и текст биографии.
+
+     Чтобы добавить нового человека в состав, ничего в HTML менять не нужно —
+     просто скопируйте один блок { ... } ниже, вставьте его как новую строку
+     массива и впишите свои данные. Сайт сам:
+       1) добавит строку с его должностью и ФИО в список "Состав руководства";
+       2) сделает эту строку кликабельной;
+       3) при клике покажет анимацию перехода (сдвиг влево), фото слева и
+          биографию справа.
+
+     Поле photo — вставьте сюда прямую ссылку на изображение (например,
+     ссылку на файл на Imgur, Discord CDN и т.п., которая заканчивается на
+     .jpg/.png/.webp). Пока своей ссылки нет — можно оставить как есть,
+     будет показана серая заглушка.
+
+     Поле bio — это текст биографии, который вы пишете сами. Можно делать
+     переносы строк прямо внутри текста (кнопкой Enter в редакторе) —
+     на сайте они отобразятся так же, абзацами.
+  ========================================================================== */
+  const staffData = [
+    {
+      role: "Нач. УФСВНГ",
+      name: "Дорофеев",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Генерал-Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Ком. СОБР «Рысь»",
+      name: "Костров А.А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Полковник.\n\nПолковник Костров Арсений Александрович - командир Специального Отряда Быстрого Реагирования "Рысь" в звании полковника.
+
+Родился 14 июня 1986 года в городе Москва. В 2000 году,когда ему было 14 лет,вместе с родителями он переехал в город Санкт Петербург к родственникам. 
+
+Имеет высшее военное образование и многолетний опыт службы в силовых структурах. Прошёл путь очень длинный и сложный путь.
+
+Под его командованием в звании полковника личный состав отряда «Рысь» успешно выполняет поставленные задачи. Он уделяет внимание высокой боевой готовности подразделения."
+    },
+    {
+      role: "Ком. ОСН \"Гром\"",
+      name: "Нестеров Л. А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Полковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Нач. ОВО",
+      name: "Сабуров С. А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Подполковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Нач. ОРЛС",
+      name: "Кестарев И. А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Лейтенант полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Ком. ОМОН \"Гранит\"",
+      name: "Рубинов М. К.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Старший сержант.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Разработчик сайта",
+      name: "Павлов Д. А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    }
+
+    // Пример, как добавить ещё одного человека — скопируйте и раскомментируйте:
+    // ,{
+    //   role: "Должность",
+    //   name: "Фамилия И. О.",
+    //   photo: "https://ссылка-на-фото.jpg",
+    //   bio: "Текст биографии."
+    // }
+  ];
+
+  const staffListEl = document.getElementById('staffList');
+  const pageStaffEl = document.getElementById('pageStaff');
+  const staffPhotoEl = document.getElementById('staffPhoto');
+  const staffRoleEl = document.getElementById('staffRole');
+  const staffNameEl = document.getElementById('staffName');
+  const staffBioTextEl = document.getElementById('staffBioText');
+  const staffBackBtn = document.getElementById('staffBackBtn');
+
+  function openDossier(index) {
+    const person = staffData[index];
+    if (!person) return;
+    staffPhotoEl.src = person.photo;
+    staffPhotoEl.alt = person.name;
+    staffRoleEl.textContent = person.role;
+    staffNameEl.textContent = person.name;
+    staffBioTextEl.textContent = person.bio;
+    document.body.classList.add('staff-open');
+    pageStaffEl.scrollTop = 0;
+  }
+
+  function closeDossier() {
+    document.body.classList.remove('staff-open');
+  }
+
+  function renderStaff() {
+    staffListEl.innerHTML = '';
+    staffData.forEach((person, index) => {
+      const row = document.createElement('div');
+      row.className = 'staff-row reveal in';
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('role', 'button');
+      row.setAttribute('aria-label', `Открыть личное дело: ${person.name}`);
+
+      const roleSpan = document.createElement('span');
+      roleSpan.className = 'staff-role';
+      roleSpan.textContent = person.role;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'staff-name';
+      nameSpan.textContent = person.name;
+
+      const arrowSpan = document.createElement('span');
+      arrowSpan.className = 'staff-arrow';
+      arrowSpan.textContent = '→';
+
+      row.appendChild(roleSpan);
+      row.appendChild(nameSpan);
+      row.appendChild(arrowSpan);
+
+      row.addEventListener('click', () => openDossier(index));
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDossier(index);
+        }
+      });
+
+      staffListEl.appendChild(row);
+    });
+  }
+
+  if (staffBackBtn) {
+    staffBackBtn.addEventListener('click', closeDossier);
+  }
+
+  renderStaff();
 </script>
 
 </body>
