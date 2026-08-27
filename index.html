@@ -375,6 +375,11 @@
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: var(--panel-2);
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .news-item-image:hover{
+    opacity: .9;
   }
   .news-item-image img{
     width: 100%;
@@ -406,6 +411,50 @@
     color: var(--khaki-dim);
     font-size: 1.1rem;
     padding: 60px 20px;
+  }
+
+  /* Image viewer modal */
+  .image-viewer{
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .image-viewer.active{
+    display: flex;
+  }
+  .image-viewer-close{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--bone);
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    z-index: 10000;
+  }
+  .image-viewer-close:hover{
+    background: var(--amber);
+    color: #14150e;
+    border-color: var(--amber);
+  }
+  .image-viewer-img{
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border: 2px solid var(--line);
+    box-shadow: 0 10px 40px rgba(0,0,0,.7);
   }
 
   /* ================= ADMIN PANEL ================= */
@@ -571,6 +620,88 @@
     margin-top: 14px;
     color: var(--brick);
     font-size: .86rem;
+  }
+
+  /* Admin news management */
+  .admin-news-section{
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+    padding-top: 30px;
+  }
+  .admin-news-title{
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--bone);
+    margin-bottom: 20px;
+  }
+  .admin-news-list{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .admin-news-item{
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .admin-news-thumb{
+    width: 80px;
+    height: 45px;
+    flex: none;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .admin-news-thumb img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .admin-news-content{
+    flex: 1;
+    min-width: 0;
+  }
+  .admin-news-text{
+    color: var(--khaki);
+    font-size: .88rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .admin-news-time{
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--khaki-dim);
+  }
+  .admin-news-delete{
+    background: var(--brick);
+    color: var(--bone);
+    border: none;
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: opacity .2s;
+    flex: none;
+  }
+  .admin-news-delete:hover{
+    opacity: .8;
+  }
+  .admin-news-empty{
+    text-align: center;
+    color: var(--khaki-dim);
+    font-size: .92rem;
+    padding: 30px;
   }
 
   /* Footer panel button */
@@ -948,6 +1079,12 @@
   </footer>
 </div>
 
+<!-- ================= IMAGE VIEWER MODAL ================= -->
+<div class="image-viewer" id="imageViewer">
+  <button class="image-viewer-close" id="imageViewerClose">✕ Закрыть</button>
+  <img class="image-viewer-img" id="imageViewerImg" src="" alt="">
+</div>
+
 <!-- ================= ADMIN PANEL ================= -->
 <div class="page-admin" id="pageAdmin">
   <button class="recruit-back" id="adminBackBtn">← Назад</button>
@@ -982,6 +1119,13 @@
       </form>
 
       <div id="adminMessage" class="admin-message" style="display: none;"></div>
+
+      <div class="admin-news-section">
+        <h3 class="admin-news-title">Управление новостями</h3>
+        <div class="admin-news-list" id="adminNewsList">
+          <div class="admin-news-empty">Новостей пока нет</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1100,6 +1244,7 @@
         document.getElementById('adminLoginSection').style.display = 'none';
         document.getElementById('adminFormSection').style.display = 'block';
         adminLoginError.style.display = 'none';
+        loadAdminNews();
       } else {
         adminLoginError.textContent = 'Неверный код';
         adminLoginError.style.display = 'block';
@@ -1147,45 +1292,97 @@
       const text = document.getElementById('newsText').value.trim();
       const file = newsImage.files[0];
 
-      if (!file || !text) {
-        adminMessage.textContent = 'Заполните все поля';
+      if (!text) {
+        adminMessage.textContent = 'Введите текст новости';
         adminMessage.style.display = 'block';
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const newsItem = {
-          image: ev.target.result,
-          text: text,
-          time: new Date().toLocaleString('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })
+      // Если есть фото, читаем его
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          publishNews(ev.target.result, text);
         };
-
-        // Save to localStorage
-        let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
-        newsData.unshift(newsItem);
-        localStorage.setItem('fsvngNews', JSON.stringify(newsData));
-
-        // Reset form
-        newsForm.reset();
-        newsImageName.textContent = 'Файл не выбран';
-        newsImagePreview.style.display = 'none';
-
-        adminMessage.textContent = 'Новость успешно опубликована!';
-        adminMessage.style.display = 'block';
-
-        setTimeout(() => {
-          adminMessage.style.display = 'none';
-        }, 3000);
-      };
-      reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+      } else {
+        // Публикуем без фото
+        publishNews(null, text);
+      }
     });
+  }
+
+  function publishNews(imageData, text) {
+    const newsItem = {
+      image: imageData,
+      text: text,
+      time: new Date().toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    };
+
+    // Save to localStorage
+    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+    newsData.unshift(newsItem);
+    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
+
+    // Reset form
+    newsForm.reset();
+    newsImageName.textContent = 'Файл не выбран';
+    newsImagePreview.style.display = 'none';
+
+    adminMessage.textContent = 'Новость успешно опубликована!';
+    adminMessage.style.display = 'block';
+
+    // Обновляем список новостей в админке
+    loadAdminNews();
+
+    setTimeout(() => {
+      adminMessage.style.display = 'none';
+    }, 3000);
+  }
+
+  // Load admin news list
+  function loadAdminNews() {
+    const adminNewsList = document.getElementById('adminNewsList');
+    const newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+
+    if (newsData.length === 0) {
+      adminNewsList.innerHTML = '<div class="admin-news-empty">Новостей пока нет</div>';
+      return;
+    }
+
+    adminNewsList.innerHTML = newsData.map((item, index) => `
+      <div class="admin-news-item">
+        ${item.image ? `
+          <div class="admin-news-thumb">
+            <img src="${item.image}" alt="Миниатюра">
+          </div>
+        ` : '<div class="admin-news-thumb" style="background: var(--panel-2);"></div>'}
+        <div class="admin-news-content">
+          <div class="admin-news-text">${item.text}</div>
+          <div class="admin-news-time">${item.time}</div>
+        </div>
+        <button class="admin-news-delete" onclick="deleteNews(${index})">Удалить</button>
+      </div>
+    `).join('');
+  }
+
+  // Delete news
+  function deleteNews(index) {
+    if (!confirm('Вы уверены, что хотите удалить эту новость?')) {
+      return;
+    }
+
+    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+    newsData.splice(index, 1);
+    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
+
+    loadAdminNews();
   }
 
   // Load and display news
@@ -1198,11 +1395,13 @@
       return;
     }
 
-    newsList.innerHTML = newsData.map(item => `
+    newsList.innerHTML = newsData.map((item, index) => `
       <article class="news-item">
-        <div class="news-item-image">
-          <img src="${item.image}" alt="Фото новости">
-        </div>
+        ${item.image ? `
+          <div class="news-item-image" onclick="openImageViewer('${item.image}')">
+            <img src="${item.image}" alt="Фото новости">
+          </div>
+        ` : ''}
         <div class="news-item-body">
           <p class="news-item-text">${item.text}</p>
           <div class="news-item-time">${item.time}</div>
@@ -1210,6 +1409,41 @@
       </article>
     `).join('');
   }
+
+  // Image viewer
+  const imageViewer = document.getElementById('imageViewer');
+  const imageViewerImg = document.getElementById('imageViewerImg');
+  const imageViewerClose = document.getElementById('imageViewerClose');
+
+  function openImageViewer(imageSrc) {
+    imageViewerImg.src = imageSrc;
+    imageViewer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeImageViewer() {
+    imageViewer.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (imageViewerClose) {
+    imageViewerClose.addEventListener('click', closeImageViewer);
+  }
+
+  if (imageViewer) {
+    imageViewer.addEventListener('click', (e) => {
+      if (e.target === imageViewer) {
+        closeImageViewer();
+      }
+    });
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && imageViewer.classList.contains('active')) {
+      closeImageViewer();
+    }
+  });
 
   const dodgeTitle = document.getElementById('dodgeTitle');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
