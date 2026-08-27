@@ -43,6 +43,44 @@
 
   a{ color: inherit; }
 
+  /* ---------- page transition (Набор) ---------- */
+  body.recruit-open{ overflow: hidden; }
+  .page-main, .page-recruit{
+    position: relative;
+    width: 100%;
+    transition: transform .6s cubic-bezier(.2,.7,.2,1);
+    will-change: transform;
+  }
+  .page-main{ transform: translateX(0); }
+  .page-recruit{
+    position: fixed; top:0; left:0; width:100%; height: 100vh; z-index: 60;
+    background: var(--bg);
+    transform: translateX(100%);
+    display:flex; flex-direction:column;
+    overflow-y: auto;
+  }
+  .recruit-content{
+    flex: 1;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding: 40px 20px;
+  }
+  body.recruit-open .page-main{ transform: translateX(-100%); }
+  body.recruit-open .page-recruit{ transform: translateX(0); }
+
+  .recruit-back{
+    position: absolute; top: 24px; right: 28px;
+    font-family: var(--font-mono); font-size:.72rem; letter-spacing:.18em;
+    text-transform: uppercase; color: var(--khaki-dim); background: none;
+    border: 1px solid var(--line); padding: 9px 16px; cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .recruit-back:hover{ color: var(--bone); border-color: var(--khaki-dim); }
+
+  .recruit-status{
+    font-family: var(--font-display); font-size: clamp(2rem, 6vw, 3.6rem);
+    text-transform: uppercase; letter-spacing:.03em; color: var(--khaki);
+  }
+
   /* ---------- top nav ---------- */
   .nav{
     position: sticky; top:0; z-index:40;
@@ -55,6 +93,12 @@
   }
   .nav a{ color: var(--khaki-dim); text-decoration:none; transition: color .15s; }
   .nav a:hover{ color: var(--bone); }
+  .nav button.nav-btn{
+    background:none; border:none; padding:0; margin:0; cursor:pointer;
+    font-family: inherit; font-size: inherit; letter-spacing: inherit; text-transform: inherit;
+    color: var(--khaki-dim); transition: color .15s;
+  }
+  .nav button.nav-btn:hover{ color: var(--bone); }
 
   /* ---------- scroll cue ---------- */
   .scroll-cue{
@@ -279,10 +323,13 @@
 
 <div class="grain"></div>
 
+<div class="page-main" id="pageMain">
+
 <nav class="nav">
   <a href="#about">О нас</a>
   <a href="#units">Подразделения</a>
   <a href="#staff">Руководство</a>
+  <button class="nav-btn" id="recruitBtn">Набор</button>
 </nav>
 
 <!-- ================= HERO ================= -->
@@ -526,6 +573,37 @@
   </div>
 </footer>
 
+</div><!-- /.page-main -->
+
+<div class="page-recruit" id="pageRecruit">
+  <button class="recruit-back" id="recruitBackBtn">← Назад</button>
+
+  <div class="recruit-content">
+    <div class="recruit-status">В разработке</div>
+  </div>
+
+  <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
+
+    <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
+      <p style="margin: 0 0 4px 0;">ФСВНГ — ролевое игровое сообщество. Данный ресурс является любительским и не связан с реальными государственными или военными структурами.</p>
+      <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
+    </div>
+
+    <div style="width: 100%; height: 1px; background-color: #222; margin-bottom: 25px;"></div>
+
+    <div class="footer-bottom-row" style="display: flex; justify-content: flex-start; max-width: 1200px; margin: 0 auto; padding-left: 15%;">
+      <div class="footer-left-block" style="text-align: left; color: #888888; font-size: 12px; line-height: 1.5; max-width: 70%;">
+        <p style="margin: 0 0 4px 0;">© <span class="currentYear">2026</span> Федеральная служба войск национальной гвардии по г. Провинция. Все права защищены.</p>
+        <p style="margin: 0;">
+          <a href="https://funbaze.fandom.com/ru/wiki/%D0%A4%D0%A1%D0%92%D0%9D%D0%93" target="_blank" rel="noopener" class="custom-wiki-link">
+            В материале использовано изображение со страницы ФСВНГ сайта FunBaze вики по лицензии CC-BY-SA.
+          </a>
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>
+
 <style>
   .custom-wiki-link {
     color: #666666; 
@@ -553,6 +631,19 @@
   const yearSpan = document.getElementById('currentYear');
   if (yearSpan) {
     yearSpan.textContent = new Date().getFullYear();
+  }
+  document.querySelectorAll('.currentYear').forEach(el => {
+    el.textContent = new Date().getFullYear();
+  });
+
+  // "Набор" page transition
+  const recruitBtn = document.getElementById('recruitBtn');
+  const recruitBackBtn = document.getElementById('recruitBackBtn');
+  if (recruitBtn) {
+    recruitBtn.addEventListener('click', () => document.body.classList.add('recruit-open'));
+  }
+  if (recruitBackBtn) {
+    recruitBackBtn.addEventListener('click', () => document.body.classList.remove('recruit-open'));
   }
 
   const dodgeTitle = document.getElementById('dodgeTitle');
@@ -616,3 +707,6 @@
   }, { threshold: .15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
+
+</body>
+</html>
