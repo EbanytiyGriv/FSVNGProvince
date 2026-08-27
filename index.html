@@ -795,132 +795,114 @@
      переносы строк прямо внутри текста (кнопкой Enter в редакторе) —
      на сайте они отобразятся так же, абзацами.
   ========================================================================== */
-  const staffData = [
-    {
-      role: "Нач. УФСВНГ",
-      name: "Дорофеев",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Генерал-Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    },
-    {
-      role: "Ком. СОБР «Рысь»",
-      name: "Костров А.А.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Полковник.\n\nПолковник Костров Арсений Александрович - командир Специального Отряда Быстрого Реагирования "Рысь" в звании полковника.
-
-Родился 14 июня 1986 года в городе Москва. В 2000 году,когда ему было 14 лет,вместе с родителями он переехал в город Санкт Петербург к родственникам. 
-
-Имеет высшее военное образование и многолетний опыт службы в силовых структурах. Прошёл путь очень длинный и сложный путь.
-
-Под его командованием в звании полковника личный состав отряда «Рысь» успешно выполняет поставленные задачи. Он уделяет внимание высокой боевой готовности подразделения."
-    },
-    {
-      role: "Ком. ОСН \"Гром\"",
-      name: "Нестеров Л. А.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Полковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    },
-    {
-      role: "Нач. ОВО",
-      name: "Сабуров С. А.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Подполковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    },
-    {
-      role: "Нач. ОРЛС",
-      name: "Кестарев И. А.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Лейтенант полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    },
-    {
-      role: "Ком. ОМОН \"Гранит\"",
-      name: "Рубинов М. К.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Старший сержант.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    },
-    {
-      role: "Разработчик сайта",
-      name: "Павлов Д. А.",
-      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
-      bio: "Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
-    }
-
-    // Пример, как добавить ещё одного человека — скопируйте и раскомментируйте:
-    // ,{
-    //   role: "Должность",
-    //   name: "Фамилия И. О.",
-    //   photo: "https://ссылка-на-фото.jpg",
-    //   bio: "Текст биографии."
-    // }
-  ];
-
-  const staffListEl = document.getElementById('staffList');
-  const pageStaffEl = document.getElementById('pageStaff');
-  const staffPhotoEl = document.getElementById('staffPhoto');
-  const staffRoleEl = document.getElementById('staffRole');
-  const staffNameEl = document.getElementById('staffName');
-  const staffBioTextEl = document.getElementById('staffBioText');
-  const staffBackBtn = document.getElementById('staffBackBtn');
-
-  function openDossier(index) {
-    const person = staffData[index];
-    if (!person) return;
-    staffPhotoEl.src = person.photo;
-    staffPhotoEl.alt = person.name;
-    staffRoleEl.textContent = person.role;
-    staffNameEl.textContent = person.name;
-    staffBioTextEl.textContent = person.bio;
-    document.body.classList.add('staff-open');
-    pageStaffEl.scrollTop = 0;
+const staffData = [
+  {
+    role: "Нач. УФСВНГ",
+    name: "Дорофеев",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Генерал-Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+  },
+  {
+    role: "Ком. СОБР «Рысь»",
+    name: "Костров А.А.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Полковник.\n\nПолковник Костров Арсений Александрович — командир Специального Отряда Быстрого Реагирования «Рысь». \n\nРодился 14 июня 1986 года в Москве. В 2000 году, когда ему было 14 лет, вместе с родителями переехал в Санкт-Петербург к родственникам.\n\nИмеет высшее военное образование и многолетний опыт службы в силовых структурах. Прошёл очень длинный и сложный путь.\n\nПод его командованием личный состав отряда «Рысь» успешно выполняет поставленные задачи. Полковник уделяет особое внимание высокой боевой готовности подразделения."
+  },
+  {
+    role: "Ком. ОСН \"Гром\"",
+    name: "Нестеров Л. А.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Полковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+  },
+  {
+    role: "Нач. ОВО",
+    name: "Сабуров С. А.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Подполковник.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+  },
+  {
+    role: "Нач. ОРЛС",
+    name: "Кестарев И. А.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Лейтенант полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+  },
+  {
+    role: "Ком. ОМОН \"Гранит\"",
+    name: "Рубинов М. К.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Старший сержант.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+  },
+  {
+    role: "Разработчик сайта",
+    name: "Павлов Д. А.",
+    photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+    bio: "Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
   }
+];
 
-  function closeDossier() {
-    document.body.classList.remove('staff-open');
-  }
+const staffListEl = document.getElementById('staffList');
+const pageStaffEl = document.getElementById('pageStaff');
+const staffPhotoEl = document.getElementById('staffPhoto');
+const staffRoleEl = document.getElementById('staffRole');
+const staffNameEl = document.getElementById('staffName');
+const staffBioTextEl = document.getElementById('staffBioText');
+const staffBackBtn = document.getElementById('staffBackBtn');
 
-  function renderStaff() {
-    staffListEl.innerHTML = '';
-    staffData.forEach((person, index) => {
-      const row = document.createElement('div');
-      row.className = 'staff-row reveal in';
-      row.setAttribute('tabindex', '0');
-      row.setAttribute('role', 'button');
-      row.setAttribute('aria-label', `Открыть личное дело: ${person.name}`);
+function openDossier(index) {
+  const person = staffData[index];
+  if (!person) return;
+  staffPhotoEl.src = person.photo;
+  staffPhotoEl.alt = person.name;
+  staffRoleEl.textContent = person.role;
+  staffNameEl.textContent = person.name;
+  staffBioTextEl.textContent = person.bio;
+  document.body.classList.add('staff-open');
+  pageStaffEl.scrollTop = 0;
+}
 
-      const roleSpan = document.createElement('span');
-      roleSpan.className = 'staff-role';
-      roleSpan.textContent = person.role;
+function closeDossier() {
+  document.body.classList.remove('staff-open');
+}
 
-      const nameSpan = document.createElement('span');
-      nameSpan.className = 'staff-name';
-      nameSpan.textContent = person.name;
+function renderStaff() {
+  staffListEl.innerHTML = '';
+  staffData.forEach((person, index) => {
+    const row = document.createElement('div');
+    row.className = 'staff-row reveal in';
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-label', `Открыть личное дело: ${person.name}`);
 
-      const arrowSpan = document.createElement('span');
-      arrowSpan.className = 'staff-arrow';
-      arrowSpan.textContent = '→';
+    const roleSpan = document.createElement('span');
+    roleSpan.className = 'staff-role';
+    roleSpan.textContent = person.role;
 
-      row.appendChild(roleSpan);
-      row.appendChild(nameSpan);
-      row.appendChild(arrowSpan);
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'staff-name';
+    nameSpan.textContent = person.name;
 
-      row.addEventListener('click', () => openDossier(index));
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openDossier(index);
-        }
-      });
+    const arrowSpan = document.createElement('span');
+    arrowSpan.className = 'staff-arrow';
+    arrowSpan.textContent = '→';
 
-      staffListEl.appendChild(row);
+    row.appendChild(roleSpan);
+    row.appendChild(nameSpan);
+    row.appendChild(arrowSpan);
+
+    row.addEventListener('click', () => openDossier(index));
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openDossier(index);
+      }
     });
-  }
 
-  if (staffBackBtn) {
-    staffBackBtn.addEventListener('click', closeDossier);
-  }
+    staffListEl.appendChild(row);
+  });
+}
 
-  renderStaff();
-</script>
+if (staffBackBtn) {
+  staffBackBtn.addEventListener('click', closeDossier);
+}
 
-</body>
-</html>
+renderStaff();
