@@ -34,7 +34,6 @@
     overflow-x: hidden;
   }
 
-  /* ---------- texture overlay ---------- */
   .grain{
     position: fixed; inset: 0; pointer-events: none; z-index: 50;
     opacity: .05; mix-blend-mode: overlay;
@@ -43,7 +42,6 @@
 
   a{ color: inherit; }
 
-  /* ---------- page transitions (Набор / Досье / Новости / Админ панель) ---------- */
   body.recruit-open, body.staff-open, body.news-open, body.admin-open{ overflow: hidden; }
   .page-main, .page-recruit, .page-staff, .page-news, .page-admin{
     position: relative;
@@ -88,7 +86,6 @@
     text-transform: uppercase; letter-spacing:.03em; color: var(--khaki);
   }
 
-  /* ---------- top nav ---------- */
   .nav{
     position: sticky; top:0; z-index:40;
     display:flex; justify-content:center; gap: 38px;
@@ -107,7 +104,6 @@
   }
   .nav button.nav-btn:hover{ color: var(--bone); }
 
-  /* ---------- scroll cue ---------- */
   .scroll-cue{
     position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
     display:flex; flex-direction:column; align-items:center; gap:8px;
@@ -125,7 +121,6 @@
     100%{ transform: scaleY(1); opacity:0;}
   }
 
-  /* ================= HERO ================= */
   .hero{
     position: relative; min-height: 100vh; width:100%;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -167,7 +162,6 @@
     max-width: 560px;
   }
 
-  /* ================= SECTION SHELL ================= */
   section.block{ padding: 100px 20px 110px; max-width: 980px; margin: 0 auto; }
   section.block + section.block{ border-top: 1px solid var(--line); }
 
@@ -182,7 +176,6 @@
   }
   .section-desc{ margin-top: 14px; color: var(--khaki); max-width: 620px; font-size: .96rem; }
 
-  /* ================= UNIT CARDS ================= */
   .units{ display:flex; flex-direction:column; gap: 34px; }
 
   .unit{
@@ -276,7 +269,6 @@
   }
   .dossier-btn:hover{ color: var(--bone); border-color: var(--bone); }
 
-  /* back face — dossier (unit cards) */
   .unit-face.back{ padding: 26px 30px; justify-content: space-between; }
   .dossier-head{ display:flex; align-items:baseline; justify-content: space-between; }
   .dossier-head .unit-name{ font-family: var(--font-display); font-size:1.3rem; text-transform:uppercase; color: var(--bone); }
@@ -285,7 +277,6 @@
     overflow-y: auto;
   }
 
-  /* ================= STAFF / LEADERSHIP ================= */
   .staff-list{ display:flex; flex-direction:column; border-top: 1px solid var(--line); }
   .staff-row{
     display:flex; align-items:center; justify-content: space-between;
@@ -314,7 +305,6 @@
     margin-left: auto; margin-right: 12px;
   }
 
-  /* ================= DOSSIER (staff detail page) ================= */
   .dossier-person{
     flex: 1;
     display:flex; align-items:stretch; justify-content:center;
@@ -339,7 +329,6 @@
     white-space: pre-line;
   }
 
-  /* ================= NEWS PAGE ================= */
   .news-content{
     flex: 1;
     padding: 90px 20px 60px;
@@ -376,16 +365,17 @@
     overflow: hidden;
     background: var(--panel-2);
     cursor: pointer;
-    transition: opacity .2s;
-  }
-  .news-item-image:hover{
-    opacity: .9;
+    position: relative;
   }
   .news-item-image img{
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform .3s;
+  }
+  .news-item-image:hover img{
+    transform: scale(1.05);
   }
   .news-item-body{
     padding: 24px 28px;
@@ -413,55 +403,47 @@
     padding: 60px 20px;
   }
 
-  /* Image viewer modal */
-  .image-viewer{
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 9999;
+  /* IMAGE MODAL (like Discord) */
+  .image-modal{
     display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    backdrop-filter: blur(4px);
+    cursor: zoom-out;
   }
-  .image-viewer.active{
+  .image-modal.active{
     display: flex;
   }
-  .image-viewer-close{
+  .image-modal-content{
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    transition: transform .2s;
+    cursor: default;
+  }
+  .image-modal-close{
     position: absolute;
     top: 20px;
-    right: 20px;
-    background: var(--panel);
-    border: 1px solid var(--line);
+    right: 30px;
+    font-size: 2rem;
     color: var(--bone);
-    font-family: var(--font-mono);
-    font-size: .8rem;
-    letter-spacing: .15em;
-    text-transform: uppercase;
-    padding: 10px 18px;
+    background: none;
+    border: none;
     cursor: pointer;
-    transition: background .2s, color .2s;
     z-index: 10000;
+    transition: color .2s;
   }
-  .image-viewer-close:hover{
-    background: var(--amber);
-    color: #14150e;
-    border-color: var(--amber);
-  }
-  .image-viewer-img{
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-    border: 2px solid var(--line);
-    box-shadow: 0 10px 40px rgba(0,0,0,.7);
+  .image-modal-close:hover{
+    color: var(--amber);
   }
 
-  /* ================= ADMIN PANEL ================= */
   .admin-content{
     flex: 1;
     padding: 90px 20px 60px;
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
     width: 100%;
   }
@@ -474,6 +456,46 @@
     margin-bottom: 40px;
     text-align: center;
   }
+
+  /* ADMIN TABS */
+  .admin-tabs{
+    display: flex;
+    gap: 0;
+    margin-bottom: 30px;
+    border: 1px solid var(--line);
+  }
+  .admin-tab-btn{
+    flex: 1;
+    padding: 14px 20px;
+    font-family: var(--font-mono);
+    font-size: .74rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    background: var(--panel);
+    color: var(--khaki-dim);
+    border: none;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    border-right: 1px solid var(--line);
+  }
+  .admin-tab-btn:last-child{
+    border-right: none;
+  }
+  .admin-tab-btn:hover{
+    color: var(--bone);
+  }
+  .admin-tab-btn.active{
+    background: var(--panel-2);
+    color: var(--amber);
+  }
+
+  .admin-tab-content{
+    display: none;
+  }
+  .admin-tab-content.active{
+    display: block;
+  }
+
   .admin-form{
     border: 1px solid var(--line);
     background: var(--panel);
@@ -490,6 +512,10 @@
     text-transform: uppercase;
     color: var(--khaki);
     margin-bottom: 10px;
+  }
+  .admin-form-label-optional{
+    color: var(--khaki-dim);
+    font-size: .68rem;
   }
   .admin-form-input,
   .admin-form-textarea{
@@ -622,89 +648,70 @@
     font-size: .86rem;
   }
 
-  /* Admin news management */
-  .admin-news-section{
-    margin-top: 40px;
-    border-top: 1px solid var(--line);
-    padding-top: 30px;
+  /* DELETE NEWS LIST */
+  .delete-news-list{
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 20px;
   }
-  .admin-news-title{
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    text-transform: uppercase;
-    color: var(--bone);
-    margin-bottom: 20px;
-  }
-  .admin-news-list{
+  .delete-news-item{
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .admin-news-item{
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
     border: 1px solid var(--line);
     background: var(--panel-2);
-    padding: 16px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    margin-bottom: 15px;
   }
-  .admin-news-thumb{
+  .delete-news-item:last-child{
+    margin-bottom: 0;
+  }
+  .delete-news-thumb{
     width: 80px;
-    height: 45px;
-    flex: none;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    overflow: hidden;
-  }
-  .admin-news-thumb img{
-    width: 100%;
-    height: 100%;
+    height: 60px;
     object-fit: cover;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
   }
-  .admin-news-content{
+  .delete-news-info{
     flex: 1;
     min-width: 0;
   }
-  .admin-news-text{
+  .delete-news-text{
     color: var(--khaki);
     font-size: .88rem;
-    line-height: 1.4;
-    margin-bottom: 8px;
-    white-space: nowrap;
+    margin-bottom: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .admin-news-time{
+  .delete-news-time{
     font-family: var(--font-mono);
-    font-size: .66rem;
-    letter-spacing: .08em;
-    text-transform: uppercase;
+    font-size: .68rem;
     color: var(--khaki-dim);
   }
-  .admin-news-delete{
+  .delete-news-btn{
     background: var(--brick);
     color: var(--bone);
     border: none;
     font-family: var(--font-mono);
-    font-size: .68rem;
+    font-size: .7rem;
     letter-spacing: .12em;
     text-transform: uppercase;
     padding: 8px 16px;
     cursor: pointer;
     transition: opacity .2s;
-    flex: none;
+    flex-shrink: 0;
   }
-  .admin-news-delete:hover{
-    opacity: .8;
+  .delete-news-btn:hover{
+    opacity: .85;
   }
-  .admin-news-empty{
+  .delete-news-empty{
     text-align: center;
     color: var(--khaki-dim);
-    font-size: .92rem;
-    padding: 30px;
+    padding: 40px 20px;
   }
 
-  /* Footer panel button */
   .footer-panel-btn{
     font-family: var(--font-mono);
     font-size: .7rem;
@@ -725,9 +732,11 @@
   @media (max-width: 720px){
     .dossier-person{ flex-direction: column; padding-top: 80px; gap: 26px; }
     .dossier-photo{ width: 180px; }
+    .admin-content{ padding: 80px 15px 50px; }
+    .delete-news-item{ flex-direction: column; align-items: stretch; }
+    .delete-news-thumb{ width: 100%; height: auto; aspect-ratio: 16/9; }
   }
 
-  /* ================= FOOTER ================= */
   footer{
     border-top: 1px solid var(--line); padding: 36px 20px 46px;
     text-align:center; color: var(--khaki-dim);
@@ -735,7 +744,6 @@
   }
   footer p{ margin-top: 6px; }
 
-  /* ================= reveal-on-scroll ================= */
   .reveal{ opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
   .reveal.in{ opacity: 1; transform: none; }
 
@@ -743,9 +751,14 @@
     .unit{ height: auto; min-height: 340px; }
     .unit-face.front{ flex-direction: column; }
     .unit-tab{ width:100%; flex-direction:row; padding: 16px; gap: 12px; border-right:none; border-bottom:1px solid var(--line); }
-    .nav{ gap: 22px; font-size:.66rem; }
+    .nav{ gap: 22px; font-size:.66rem; flex-wrap: wrap; }
     .staff-row{ flex-wrap: wrap; gap: 4px; }
     .staff-name{ margin-left: 0; }
+    .connect{ flex-direction: column; align-items: stretch; padding: 12px; }
+    .connect code{ font-size: .74rem; word-break: break-all; }
+    .admin-tabs{ flex-direction: column; }
+    .admin-tab-btn{ border-right: none; border-bottom: 1px solid var(--line); }
+    .admin-tab-btn:last-child{ border-bottom: none; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -754,11 +767,42 @@
     .unit-inner{ transition: none; }
     .reveal{ transition: none; opacity:1; transform:none; }
   }
+
+  .custom-wiki-link {
+    color: #666666;
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+  .custom-wiki-link:hover {
+    color: #ffffff !important;
+    text-decoration: underline !important;
+  }
+
+  @media (max-width: 768px) {
+    .footer-bottom-row {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 15px;
+    }
+    .footer-left-block {
+      max-width: 100% !important;
+      text-align: center !important;
+    }
+    .footer-right-block {
+      text-align: center !important;
+    }
+  }
 </style>
 </head>
 <body>
 
 <div class="grain"></div>
+
+<!-- IMAGE MODAL -->
+<div class="image-modal" id="imageModal">
+  <button class="image-modal-close" id="imageModalClose">&times;</button>
+  <img class="image-modal-content" id="imageModalImg" alt="Просмотр изображения">
+</div>
 
 <div class="page-main" id="pageMain">
 
@@ -770,7 +814,6 @@
   <button class="nav-btn" id="recruitBtn">Набор</button>
 </nav>
 
-<!-- ================= HERO ================= -->
 <section class="hero">
   <div class="kicker">Портал личного состава</div>
 
@@ -791,7 +834,6 @@
   <div class="scroll-cue"><span class="line"></span>Листайте вниз</div>
 </section>
 
-<!-- ================= ABOUT ================= -->
 <section class="block" id="about">
   <div class="section-head reveal">
     <div class="section-eyebrow">О нас</div>
@@ -804,8 +846,6 @@
   </div>
 </section>
 
-
-<!-- ================= UNITS / SERVERS ================= -->
 <section class="block" id="units">
   <div class="section-head reveal">
     <div class="section-eyebrow">Подразделения · серверы</div>
@@ -815,7 +855,6 @@
 
   <div class="units">
 
-    <!-- ОСН ГРОМ -->
     <article class="unit reveal" data-tone="grom">
       <div class="unit-inner">
         <div class="unit-face front">
@@ -845,7 +884,6 @@
       </div>
     </article>
 
-    <!-- СБОР РЫСЬ -->
     <article class="unit reveal" data-tone="rys">
       <div class="unit-inner">
         <div class="unit-face front">
@@ -875,7 +913,6 @@
       </div>
     </article>
 
-    <!-- ОВО -->
     <article class="unit reveal" data-tone="ovo">
       <div class="unit-inner">
         <div class="unit-face front">
@@ -905,7 +942,6 @@
       </div>
     </article>
 
-    <!-- ОРЛС -->
     <article class="unit reveal" data-tone="orls">
       <div class="unit-inner">
         <div class="unit-face front">
@@ -935,7 +971,6 @@
       </div>
     </article>
 
-    <!-- ОМОН -->
     <article class="unit reveal" data-tone="omon">
       <div class="unit-inner">
         <div class="unit-face front">
@@ -968,7 +1003,6 @@
   </div>
 </section>
 
-<!-- ================= STAFF ================= -->
 <section class="block" id="staff">
   <div class="section-head reveal">
     <div class="section-eyebrow">Руководство · разработка</div>
@@ -976,22 +1010,18 @@
     <p class="section-desc">Ответственные за портал и координацию подразделений. Нажмите на имя, чтобы открыть личное дело.</p>
   </div>
 
-  <!-- Список строится автоматически из массива staffData в конце файла -->
   <div class="staff-list" id="staffList"></div>
 </section>
 
 <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
-
   <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
     <p style="margin: 0 0 4px 0;">ФСВНГ — ролевое игровое сообщество. Данный ресурс является любительским и не связан с реальными государственными или военными структурами.</p>
     <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
   </div>
 
-  <!-- Тонкая разделительная линия на всю ширину -->
   <div style="width: 100%; height: 1px; background-color: #222; margin-bottom: 25px;"></div>
 
   <div class="footer-bottom-row" style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 15px;">
-
     <div class="footer-left-block" style="text-align: left; color: #888888; font-size: 12px; line-height: 1.5; max-width: 70%;">
       <p style="margin: 0 0 4px 0;">© <span id="currentYear">2026</span> Федеральная служба войск национальной гвардии по г. Провинция. Все права защищены.</p>
       <p style="margin: 0;">
@@ -1004,28 +1034,22 @@
     <div class="footer-right-block" style="text-align: right;">
       <button class="footer-panel-btn" id="adminPanelBtn">Панель</button>
     </div>
-
   </div>
 </footer>
 
-</div><!-- /.page-main -->
+</div>
 
 <div class="page-recruit" id="pageRecruit">
   <button class="recruit-back" id="recruitBackBtn">← Назад</button>
-
   <div class="recruit-content">
     <div class="recruit-status">В разработке</div>
   </div>
-
   <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
-
     <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
       <p style="margin: 0 0 4px 0;">ФСВНГ — ролевое игровое сообщество. Данный ресурс является любительским и не связан с реальными государственными или военными структурами.</p>
       <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
     </div>
-
     <div style="width: 100%; height: 1px; background-color: #222; margin-bottom: 25px;"></div>
-
     <div class="footer-bottom-row" style="display: flex; justify-content: flex-start; max-width: 1200px; margin: 0 auto; padding-left: 15%;">
       <div class="footer-left-block" style="text-align: left; color: #888888; font-size: 12px; line-height: 1.5; max-width: 70%;">
         <p style="margin: 0 0 4px 0;">© <span class="currentYear">2026</span> Федеральная служба войск национальной гвардии по г. Провинция. Все права защищены.</p>
@@ -1039,10 +1063,8 @@
   </footer>
 </div>
 
-<!-- ================= ДОСЬЕ СОТРУДНИКА (открывается по клику на ФИО) ================= -->
 <div class="page-staff" id="pageStaff">
   <button class="recruit-back" id="staffBackBtn">← Назад</button>
-
   <div class="dossier-person">
     <div class="dossier-photo">
       <img id="staffPhoto" src="" alt="">
@@ -1053,7 +1075,6 @@
       <p class="dossier-bio-text" id="staffBioText"></p>
     </div>
   </div>
-
   <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
     <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6;">
       <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
@@ -1061,17 +1082,14 @@
   </footer>
 </div>
 
-<!-- ================= NEWS PAGE ================= -->
 <div class="page-news" id="pageNews">
   <button class="recruit-back" id="newsBackBtn">← Назад</button>
-
   <div class="news-content">
     <h2 class="news-header">Новости</h2>
     <div class="news-list" id="newsList">
       <div class="news-empty">Новостей пока нет</div>
     </div>
   </div>
-
   <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
     <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6;">
       <p style="margin: 0; color: #555555; font-size: 12px;">Адрес сайта: fsvng-province.vercel.app</p>
@@ -1079,13 +1097,6 @@
   </footer>
 </div>
 
-<!-- ================= IMAGE VIEWER MODAL ================= -->
-<div class="image-viewer" id="imageViewer">
-  <button class="image-viewer-close" id="imageViewerClose">✕ Закрыть</button>
-  <img class="image-viewer-img" id="imageViewerImg" src="" alt="">
-</div>
-
-<!-- ================= ADMIN PANEL ================= -->
 <div class="page-admin" id="pageAdmin">
   <button class="recruit-back" id="adminBackBtn">← Назад</button>
 
@@ -1101,29 +1112,35 @@
     </div>
 
     <div id="adminFormSection" style="display: none;">
-      <form class="admin-form" id="newsForm">
-        <div class="admin-form-group">
-          <label class="admin-form-label">Фото</label>
-          <label for="newsImage" class="admin-form-file-label">Выбрать файл</label>
-          <input type="file" id="newsImage" class="admin-form-file" accept="image/*">
-          <span id="newsImageName" class="admin-form-file-name">Файл не выбран</span>
-          <img id="newsImagePreview" class="admin-form-preview" style="display: none;">
-        </div>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" data-tab="create">Выпуск публикации</button>
+        <button class="admin-tab-btn" data-tab="delete">Убрать публикацию</button>
+      </div>
 
-        <div class="admin-form-group">
-          <label class="admin-form-label" for="newsText">Текст новости</label>
-          <textarea id="newsText" class="admin-form-textarea" placeholder="Введите текст новости..."></textarea>
-        </div>
+      <div class="admin-tab-content active" id="tabCreate">
+        <form class="admin-form" id="newsForm">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Фото <span class="admin-form-label-optional">(необязательно)</span></label>
+            <label for="newsImage" class="admin-form-file-label">Выбрать файл</label>
+            <input type="file" id="newsImage" class="admin-form-file" accept="image/*">
+            <span id="newsImageName" class="admin-form-file-name">Файл не выбран</span>
+            <img id="newsImagePreview" class="admin-form-preview" style="display: none;">
+          </div>
 
-        <button type="submit" class="admin-form-submit">Выпустить новость</button>
-      </form>
+          <div class="admin-form-group">
+            <label class="admin-form-label" for="newsText">Текст новости</label>
+            <textarea id="newsText" class="admin-form-textarea" placeholder="Введите текст новости..."></textarea>
+          </div>
 
-      <div id="adminMessage" class="admin-message" style="display: none;"></div>
+          <button type="submit" class="admin-form-submit">Выпустить новость</button>
+        </form>
 
-      <div class="admin-news-section">
-        <h3 class="admin-news-title">Управление новостями</h3>
-        <div class="admin-news-list" id="adminNewsList">
-          <div class="admin-news-empty">Новостей пока нет</div>
+        <div id="adminMessage" class="admin-message" style="display: none;"></div>
+      </div>
+
+      <div class="admin-tab-content" id="tabDelete">
+        <div class="delete-news-list" id="deleteNewsList">
+          <div class="delete-news-empty">Новостей нет</div>
         </div>
       </div>
     </div>
@@ -1136,51 +1153,8 @@
   </footer>
 </div>
 
-<style>
-  .custom-wiki-link {
-    color: #666666;
-    text-decoration: none;
-    transition: color 0.25s ease;
-  }
-  .custom-wiki-link:hover {
-    color: #ffffff !important;
-    text-decoration: underline !important;
-  }
-
-  @media (max-width: 768px) {
-    .footer-bottom-row {
-      flex-direction: column !important;
-      align-items: center !important;
-      gap: 15px;
-    }
-    .footer-left-block {
-      max-width: 100% !important;
-      text-align: center !important;
-    }
-    .footer-right-block {
-      text-align: center !important;
-    }
-  }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-  // ================= SUPABASE CONFIG =================
-  const SUPABASE_URL = 'https://nmrfpxgtjbnoozeljhme.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_GSH3zpVP7IUfeRBVDY6ibQ_ayjKPT7c';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  // Hash для кода панели (sha256 для "Qwrytdgf35g")
-  const ADMIN_CODE_HASH = '37485a60d998c7d850b5a1164f417de2becd531c6d2e4700da884cb58417e464';
-
-  async function hashCode(code) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(code);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
+  const ADMIN_CODE = 'Privet';
 
   const yearSpan = document.getElementById('currentYear');
   if (yearSpan) {
@@ -1190,7 +1164,6 @@
     el.textContent = new Date().getFullYear();
   });
 
-  // "Набор" page transition
   const recruitBtn = document.getElementById('recruitBtn');
   const recruitBackBtn = document.getElementById('recruitBackBtn');
   if (recruitBtn) {
@@ -1200,7 +1173,6 @@
     recruitBackBtn.addEventListener('click', () => document.body.classList.remove('recruit-open'));
   }
 
-  // "Новости" page transition
   const newsBtn = document.getElementById('newsBtn');
   const newsBackBtn = document.getElementById('newsBackBtn');
   if (newsBtn) {
@@ -1213,7 +1185,6 @@
     newsBackBtn.addEventListener('click', () => document.body.classList.remove('news-open'));
   }
 
-  // "Админ панель" transitions
   const adminPanelBtn = document.getElementById('adminPanelBtn');
   const adminBackBtn = document.getElementById('adminBackBtn');
   if (adminPanelBtn) {
@@ -1224,7 +1195,6 @@
   if (adminBackBtn) {
     adminBackBtn.addEventListener('click', () => {
       document.body.classList.remove('admin-open');
-      // Reset admin panel
       document.getElementById('adminLoginSection').style.display = 'block';
       document.getElementById('adminFormSection').style.display = 'none';
       document.getElementById('adminPassword').value = '';
@@ -1232,13 +1202,12 @@
     });
   }
 
-  // Admin login
   const adminLoginBtn = document.getElementById('adminLoginBtn');
   const adminPassword = document.getElementById('adminPassword');
   const adminLoginError = document.getElementById('adminLoginError');
 
   if (adminLoginBtn) {
-    adminLoginBtn.addEventListener('click', async () => {
+    adminLoginBtn.addEventListener('click', () => {
       const code = adminPassword.value.trim();
       if (!code) {
         adminLoginError.textContent = 'Введите код';
@@ -1246,12 +1215,11 @@
         return;
       }
 
-      const hashed = await hashCode(code);
-      if (hashed === ADMIN_CODE_HASH) {
+      if (code === ADMIN_CODE) {
         document.getElementById('adminLoginSection').style.display = 'none';
         document.getElementById('adminFormSection').style.display = 'block';
         adminLoginError.style.display = 'none';
-        loadAdminNews();
+        loadDeleteNewsList();
       } else {
         adminLoginError.textContent = 'Неверный код';
         adminLoginError.style.display = 'block';
@@ -1265,7 +1233,21 @@
     });
   }
 
-  // News form: image preview
+  // Admin tabs
+  document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.getAttribute('data-tab');
+      document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+
+      if (tabName === 'delete') {
+        loadDeleteNewsList();
+      }
+    });
+  });
+
   const newsImage = document.getElementById('newsImage');
   const newsImageName = document.getElementById('newsImageName');
   const newsImagePreview = document.getElementById('newsImagePreview');
@@ -1288,81 +1270,52 @@
     });
   }
 
-  // News form submit
   const newsForm = document.getElementById('newsForm');
   const adminMessage = document.getElementById('adminMessage');
 
   if (newsForm) {
-    newsForm.addEventListener('submit', async (e) => {
+    newsForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const text = document.getElementById('newsText').value.trim();
       const file = newsImage.files[0];
 
       if (!text) {
-        adminMessage.textContent = 'Введите текст новости';
+        adminMessage.textContent = 'Заполните текст новости';
         adminMessage.style.display = 'block';
         return;
       }
 
-      // Disable submit button while uploading
-      const submitBtn = newsForm.querySelector('.admin-form-submit');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Загружаем...';
+      const newsItem = {
+        text: text,
+        time: new Date().toLocaleString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        id: Date.now()
+      };
 
-      try {
-        await publishNews(file, text);
-      } catch (error) {
-        adminMessage.textContent = 'Ошибка: ' + error.message;
-        adminMessage.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Выпустить новость';
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          newsItem.image = ev.target.result;
+          saveNews(newsItem);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        saveNews(newsItem);
       }
     });
   }
 
-  async function publishNews(file, text) {
-    let imageUrl = null;
+  function saveNews(newsItem) {
+    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+    newsData.unshift(newsItem);
+    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
 
-    // Если есть фото — загружаем в Supabase Storage
-    if (file) {
-      const fileName = `${Date.now()}_${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('news-images')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        throw new Error('Ошибка загрузки фото: ' + uploadError.message);
-      }
-
-      // Получаем публичный URL
-      const { data: urlData } = supabase.storage
-        .from('news-images')
-        .getPublicUrl(fileName);
-
-      imageUrl = urlData.publicUrl;
-    }
-
-    // Сохраняем новость в таблицу
-    const { data, error } = await supabase
-      .from('news')
-      .insert([
-        {
-          text: text,
-          image_url: imageUrl
-        }
-      ])
-      .select();
-
-    if (error) {
-      throw new Error('Ошибка сохранения новости: ' + error.message);
-    }
-
-    // Reset form
     newsForm.reset();
     newsImageName.textContent = 'Файл не выбран';
     newsImagePreview.style.display = 'none';
@@ -1370,178 +1323,80 @@
     adminMessage.textContent = 'Новость успешно опубликована!';
     adminMessage.style.display = 'block';
 
-    // Обновляем список новостей в админке
-    await loadAdminNews();
-
     setTimeout(() => {
       adminMessage.style.display = 'none';
     }, 3000);
   }
 
-  // Load admin news list
-  async function loadAdminNews() {
-    const adminNewsList = document.getElementById('adminNewsList');
+  function loadNews() {
+    const newsList = document.getElementById('newsList');
+    const newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
 
-    try {
-      const { data: newsData, error } = await supabase
-        .from('news')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        adminNewsList.innerHTML = '<div class="admin-news-empty">Ошибка загрузки новостей</div>';
-        console.error('Error loading news:', error);
-        return;
-      }
-
-      if (!newsData || newsData.length === 0) {
-        adminNewsList.innerHTML = '<div class="admin-news-empty">Новостей пока нет</div>';
-        return;
-      }
-
-      adminNewsList.innerHTML = newsData.map((item) => {
-        const formattedTime = new Date(item.created_at).toLocaleString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-
-        return `
-          <div class="admin-news-item">
-            ${item.image_url ? `
-              <div class="admin-news-thumb">
-                <img src="${item.image_url}" alt="Миниатюра">
-              </div>
-            ` : '<div class="admin-news-thumb" style="background: var(--panel-2);"></div>'}
-            <div class="admin-news-content">
-              <div class="admin-news-text">${item.text}</div>
-              <div class="admin-news-time">${formattedTime}</div>
-            </div>
-            <button class="admin-news-delete" onclick="deleteNews('${item.id}', '${item.image_url || ''}')">Удалить</button>
-          </div>
-        `;
-      }).join('');
-    } catch (err) {
-      adminNewsList.innerHTML = '<div class="admin-news-empty">Ошибка: ' + err.message + '</div>';
-    }
-  }
-
-  // Delete news
-  async function deleteNews(newsId, imageUrl) {
-    if (!confirm('Вы уверены, что хотите удалить эту новость?')) {
+    if (newsData.length === 0) {
+      newsList.innerHTML = '<div class="news-empty">Новостей пока нет</div>';
       return;
     }
 
-    try {
-      // Удаляем фото из Storage, если оно есть
-      if (imageUrl) {
-        const fileName = imageUrl.split('/').pop();
-        await supabase.storage
-          .from('news-images')
-          .remove([fileName]);
-      }
+    newsList.innerHTML = newsData.map(item => `
+      <article class="news-item">
+        ${item.image ? `
+          <div class="news-item-image" onclick="openImageModal('${item.image}')">
+            <img src="${item.image}" alt="Фото новости">
+          </div>
+        ` : ''}
+        <div class="news-item-body">
+          <p class="news-item-text">${item.text}</p>
+          <div class="news-item-time">${item.time}</div>
+        </div>
+      </article>
+    `).join('');
+  }
 
-      // Удаляем запись из таблицы
-      const { error } = await supabase
-        .from('news')
-        .delete()
-        .eq('id', newsId);
+  function loadDeleteNewsList() {
+    const deleteNewsList = document.getElementById('deleteNewsList');
+    const newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
 
-      if (error) {
-        alert('Ошибка удаления: ' + error.message);
-        return;
-      }
-
-      // Обновляем список
-      await loadAdminNews();
-    } catch (err) {
-      alert('Ошибка: ' + err.message);
+    if (newsData.length === 0) {
+      deleteNewsList.innerHTML = '<div class="delete-news-empty">Новостей нет</div>';
+      return;
     }
+
+    deleteNewsList.innerHTML = newsData.map((item, index) => `
+      <div class="delete-news-item">
+        ${item.image ? `<img src="${item.image}" alt="Миниатюра" class="delete-news-thumb">` : ''}
+        <div class="delete-news-info">
+          <div class="delete-news-text">${item.text}</div>
+          <div class="delete-news-time">${item.time}</div>
+        </div>
+        <button class="delete-news-btn" onclick="deleteNews(${index})">Удалить</button>
+      </div>
+    `).join('');
   }
 
-  // Load and display news
-  async function loadNews() {
-    const newsList = document.getElementById('newsList');
-
-    try {
-      const { data: newsData, error } = await supabase
-        .from('news')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        newsList.innerHTML = '<div class="news-empty">Ошибка загрузки новостей</div>';
-        console.error('Error loading news:', error);
-        return;
-      }
-
-      if (!newsData || newsData.length === 0) {
-        newsList.innerHTML = '<div class="news-empty">Новостей пока нет</div>';
-        return;
-      }
-
-      newsList.innerHTML = newsData.map((item) => {
-        const formattedTime = new Date(item.created_at).toLocaleString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-
-        return `
-          <article class="news-item">
-            ${item.image_url ? `
-              <div class="news-item-image" onclick="openImageViewer('${item.image_url}')">
-                <img src="${item.image_url}" alt="Фото новости">
-              </div>
-            ` : ''}
-            <div class="news-item-body">
-              <p class="news-item-text">${item.text}</p>
-              <div class="news-item-time">${formattedTime}</div>
-            </div>
-          </article>
-        `;
-      }).join('');
-    } catch (err) {
-      newsList.innerHTML = '<div class="news-empty">Ошибка: ' + err.message + '</div>';
-    }
+  function deleteNews(index) {
+    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+    newsData.splice(index, 1);
+    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
+    loadDeleteNewsList();
   }
 
-  // Image viewer
-  const imageViewer = document.getElementById('imageViewer');
-  const imageViewerImg = document.getElementById('imageViewerImg');
-  const imageViewerClose = document.getElementById('imageViewerClose');
+  // Image modal
+  const imageModal = document.getElementById('imageModal');
+  const imageModalImg = document.getElementById('imageModalImg');
+  const imageModalClose = document.getElementById('imageModalClose');
 
-  function openImageViewer(imageSrc) {
-    imageViewerImg.src = imageSrc;
-    imageViewer.classList.add('active');
-    document.body.style.overflow = 'hidden';
+  function openImageModal(src) {
+    imageModalImg.src = src;
+    imageModal.classList.add('active');
   }
 
-  function closeImageViewer() {
-    imageViewer.classList.remove('active');
-    document.body.style.overflow = '';
-  }
+  imageModalClose.addEventListener('click', () => {
+    imageModal.classList.remove('active');
+  });
 
-  if (imageViewerClose) {
-    imageViewerClose.addEventListener('click', closeImageViewer);
-  }
-
-  if (imageViewer) {
-    imageViewer.addEventListener('click', (e) => {
-      if (e.target === imageViewer) {
-        closeImageViewer();
-      }
-    });
-  }
-
-  // Close on Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && imageViewer.classList.contains('active')) {
-      closeImageViewer();
+  imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+      imageModal.classList.remove('active');
     }
   });
 
@@ -1572,7 +1427,6 @@
     });
   }
 
-  // copy to clipboard
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const text = btn.getAttribute('data-copy');
@@ -1589,7 +1443,6 @@
     });
   });
 
-  // dossier flip (unit cards)
   document.querySelectorAll('.dossier-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.getAttribute('data-target');
@@ -1598,7 +1451,6 @@
     });
   });
 
-  // reveal on scroll
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) entry.target.classList.add('in');
@@ -1606,29 +1458,6 @@
   }, { threshold: .15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  /* ==========================================================================
-     СОСТАВ РУКОВОДСТВА — ДОБАВЛЕНИЕ НОВОГО ЧЕЛОВЕКА
-     ==========================================================================
-     Всё руководство описано ниже, в массиве staffData. Каждая запись — это
-     один человек: должность, ФИО, ссылка (URL) на фото и текст биографии.
-
-     Чтобы добавить нового человека в состав, ничего в HTML менять не нужно —
-     просто скопируйте один блок { ... } ниже, вставьте его как новую строку
-     массива и впишите свои данные. Сайт сам:
-       1) добавит строку с его должностью и ФИО в список "Состав руководства";
-       2) сделает эту строку кликабельной;
-       3) при клике покажет анимацию перехода (сдвиг влево), фото слева и
-          биографию справа.
-
-     Поле photo — вставьте сюда прямую ссылку на изображение (например,
-     ссылку на файл на Imgur, Discord CDN и т.п., которая заканчивается на
-     .jpg/.png/.webp). Пока своей ссылки нет — можно оставить как есть,
-     будет показана серая заглушка.
-
-     Поле bio — это текст биографии, который вы пишете сами. Можно делать
-     переносы строк прямо внутри текста (кнопкой Enter в редакторе) —
-     на сайте они отобразятся так же, абзацами.
-  ========================================================================== */
   const staffData = [
     {
       role: "Начальник УФСВНГ",
@@ -1661,3 +1490,86 @@
       bio: "Лейтенант полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
     },
     {
+      role: "Командир ОМОН \"Гранит\"",
+      name: "Рубинов М. К.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Старший сержант полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    },
+    {
+      role: "Разработчик сайта",
+      name: "Павлов Д. А.",
+      photo: "https://placehold.co/600x800/1f2317/7c7f61?text=Фото",
+      bio: "Майор полиции.\n\nВпишите текст — например, дату вступления в службу, послужной список, зону ответственности."
+    }
+  ];
+
+  const staffListEl = document.getElementById('staffList');
+  const pageStaffEl = document.getElementById('pageStaff');
+  const staffPhotoEl = document.getElementById('staffPhoto');
+  const staffRoleEl = document.getElementById('staffRole');
+  const staffNameEl = document.getElementById('staffName');
+  const staffBioTextEl = document.getElementById('staffBioText');
+  const staffBackBtn = document.getElementById('staffBackBtn');
+
+  function openDossier(index) {
+    const person = staffData[index];
+    if (!person) return;
+    staffPhotoEl.src = person.photo;
+    staffPhotoEl.alt = person.name;
+    staffRoleEl.textContent = person.role;
+    staffNameEl.textContent = person.name;
+    staffBioTextEl.textContent = person.bio;
+    document.body.classList.add('staff-open');
+    pageStaffEl.scrollTop = 0;
+  }
+
+  function closeDossier() {
+    document.body.classList.remove('staff-open');
+  }
+
+  function renderStaff() {
+    staffListEl.innerHTML = '';
+    staffData.forEach((person, index) => {
+      const row = document.createElement('div');
+      row.className = 'staff-row reveal in';
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('role', 'button');
+      row.setAttribute('aria-label', `Открыть личное дело: ${person.name}`);
+
+      const roleSpan = document.createElement('span');
+      roleSpan.className = 'staff-role';
+      roleSpan.textContent = person.role;
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'staff-name';
+      nameSpan.textContent = person.name;
+
+      const arrowSpan = document.createElement('span');
+      arrowSpan.className = 'staff-arrow';
+      arrowSpan.textContent = '→';
+
+      row.appendChild(roleSpan);
+      row.appendChild(nameSpan);
+      row.appendChild(arrowSpan);
+
+      row.addEventListener('click', () => openDossier(index));
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDossier(index);
+        }
+      });
+
+      staffListEl.appendChild(row);
+    });
+  }
+
+  if (staffBackBtn) {
+    staffBackBtn.addEventListener('click', closeDossier);
+  }
+
+  renderStaff();
+</script>
+
+</body>
+</html>
