@@ -403,7 +403,6 @@
     padding: 60px 20px;
   }
 
-  /* IMAGE MODAL (like Discord) */
   .image-modal{
     display: none;
     position: fixed;
@@ -457,7 +456,6 @@
     text-align: center;
   }
 
-  /* ADMIN TABS */
   .admin-tabs{
     display: flex;
     gap: 0;
@@ -648,7 +646,6 @@
     font-size: .86rem;
   }
 
-  /* DELETE NEWS LIST */
   .delete-news-list{
     border: 1px solid var(--line);
     background: var(--panel);
@@ -798,7 +795,6 @@
 
 <div class="grain"></div>
 
-<!-- IMAGE MODAL -->
 <div class="image-modal" id="imageModal">
   <button class="image-modal-close" id="imageModalClose">&times;</button>
   <img class="image-modal-content" id="imageModalImg" alt="Просмотр изображения">
@@ -1087,7 +1083,7 @@
   <div class="news-content">
     <h2 class="news-header">Новости</h2>
     <div class="news-list" id="newsList">
-      <div class="news-empty">Новостей пока нет</div>
+      <div class="news-empty">Загрузка новостей...</div>
     </div>
   </div>
   <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
@@ -1140,7 +1136,7 @@
 
       <div class="admin-tab-content" id="tabDelete">
         <div class="delete-news-list" id="deleteNewsList">
-          <div class="delete-news-empty">Новостей нет</div>
+          <div class="delete-news-empty">Загрузка...</div>
         </div>
       </div>
     </div>
@@ -1153,7 +1149,22 @@
   </footer>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDyUq4ZbaqUs8cymDUMdn8eR_xD3Kzl5AU",
+    authDomain: "dfgdfg-95a47.firebaseapp.com",
+    projectId: "dfgdfg-95a47",
+    storageBucket: "dfgdfg-95a47.firebasestorage.app",
+    messagingSenderId: "333443743771",
+    appId: "1:333443743771:web:2b8e06cd851dd6ada638be"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   const ADMIN_CODE = 'Privet';
 
   const yearSpan = document.getElementById('currentYear');
@@ -1233,7 +1244,6 @@
     });
   }
 
-  // Admin tabs
   document.querySelectorAll('.admin-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const tabName = btn.getAttribute('data-tab');
@@ -1274,7 +1284,7 @@
   const adminMessage = document.getElementById('adminMessage');
 
   if (newsForm) {
-    newsForm.addEventListener('submit', (e) => {
+    newsForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const text = document.getElementById('newsText').value.trim();
@@ -1288,104 +1298,130 @@
 
       const newsItem = {
         text: text,
+        timestamp: serverTimestamp(),
         time: new Date().toLocaleString('ru-RU', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
-        }),
-        id: Date.now()
+        })
       };
 
       if (file) {
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = async (ev) => {
           newsItem.image = ev.target.result;
-          saveNews(newsItem);
+          await saveNews(newsItem);
         };
         reader.readAsDataURL(file);
       } else {
-        saveNews(newsItem);
+        await saveNews(newsItem);
       }
     });
   }
 
-  function saveNews(newsItem) {
-    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
-    newsData.unshift(newsItem);
-    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
+  async function saveNews(newsItem) {
+    try {
+      await addDoc(collection(db, 'news'), newsItem);
 
-    newsForm.reset();
-    newsImageName.textContent = 'Файл не выбран';
-    newsImagePreview.style.display = 'none';
+      newsForm.reset();
+      newsImageName.textContent = 'Файл не выбран';
+      newsImagePreview.style.display = 'none';
 
-    adminMessage.textContent = 'Новость успешно опубликована!';
-    adminMessage.style.display = 'block';
+      adminMessage.textContent = 'Новость успешно опубликована!';
+      adminMessage.style.display = 'block';
 
-    setTimeout(() => {
-      adminMessage.style.display = 'none';
-    }, 3000);
+      setTimeout(() => {
+        adminMessage.style.display = 'none';
+      }, 3000);
+    } catch (error) {
+      console.error("Ошибка публикации:", error);
+      adminMessage.textContent = 'Ошибка публикации: ' + error.message;
+      adminMessage.style.display = 'block';
+    }
   }
 
-  function loadNews() {
+  async function loadNews() {
     const newsList = document.getElementById('newsList');
-    const newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
+    try {
+      const q = query(collection(db, 'news'), orderBy('timestamp', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const newsData = [];
+      querySnapshot.forEach((document) => {
+        newsData.push({ ...document.data(), docId: document.id });
+      });
 
-    if (newsData.length === 0) {
-      newsList.innerHTML = '<div class="news-empty">Новостей пока нет</div>';
-      return;
-    }
+      if (newsData.length === 0) {
+        newsList.innerHTML = '<div class="news-empty">Новостей пока нет</div>';
+        return;
+      }
 
-    newsList.innerHTML = newsData.map(item => `
-      <article class="news-item">
-        ${item.image ? `
-          <div class="news-item-image" onclick="openImageModal('${item.image}')">
-            <img src="${item.image}" alt="Фото новости">
+      newsList.innerHTML = newsData.map(item => `
+        <article class="news-item">
+          ${item.image ? `
+            <div class="news-item-image" onclick="openImageModal('${item.image}')">
+              <img src="${item.image}" alt="Фото новости">
+            </div>
+          ` : ''}
+          <div class="news-item-body">
+            <p class="news-item-text">${item.text}</p>
+            <div class="news-item-time">${item.time}</div>
           </div>
-        ` : ''}
-        <div class="news-item-body">
-          <p class="news-item-text">${item.text}</p>
-          <div class="news-item-time">${item.time}</div>
-        </div>
-      </article>
-    `).join('');
-  }
-
-  function loadDeleteNewsList() {
-    const deleteNewsList = document.getElementById('deleteNewsList');
-    const newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
-
-    if (newsData.length === 0) {
-      deleteNewsList.innerHTML = '<div class="delete-news-empty">Новостей нет</div>';
-      return;
+        </article>
+      `).join('');
+    } catch (error) {
+      console.error("Ошибка загрузки новостей:", error);
+      newsList.innerHTML = '<div class="news-empty">Ошибка загрузки новостей</div>';
     }
+  }
 
-    deleteNewsList.innerHTML = newsData.map((item, index) => `
-      <div class="delete-news-item">
-        ${item.image ? `<img src="${item.image}" alt="Миниатюра" class="delete-news-thumb">` : ''}
-        <div class="delete-news-info">
-          <div class="delete-news-text">${item.text}</div>
-          <div class="delete-news-time">${item.time}</div>
+  async function loadDeleteNewsList() {
+    const deleteNewsList = document.getElementById('deleteNewsList');
+    try {
+      const q = query(collection(db, 'news'), orderBy('timestamp', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const newsData = [];
+      querySnapshot.forEach((document) => {
+        newsData.push({ ...document.data(), docId: document.id });
+      });
+
+      if (newsData.length === 0) {
+        deleteNewsList.innerHTML = '<div class="delete-news-empty">Новостей нет</div>';
+        return;
+      }
+
+      deleteNewsList.innerHTML = newsData.map((item) => `
+        <div class="delete-news-item">
+          ${item.image ? `<img src="${item.image}" alt="Миниатюра" class="delete-news-thumb">` : ''}
+          <div class="delete-news-info">
+            <div class="delete-news-text">${item.text}</div>
+            <div class="delete-news-time">${item.time}</div>
+          </div>
+          <button class="delete-news-btn" onclick="deleteNews('${item.docId}')">Удалить</button>
         </div>
-        <button class="delete-news-btn" onclick="deleteNews(${index})">Удалить</button>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (error) {
+      console.error("Ошибка загрузки списка:", error);
+      deleteNewsList.innerHTML = '<div class="delete-news-empty">Ошибка загрузки</div>';
+    }
   }
 
-  function deleteNews(index) {
-    let newsData = JSON.parse(localStorage.getItem('fsvngNews') || '[]');
-    newsData.splice(index, 1);
-    localStorage.setItem('fsvngNews', JSON.stringify(newsData));
-    loadDeleteNewsList();
+  window.deleteNews = async function(docId) {
+    try {
+      await deleteDoc(doc(db, 'news', docId));
+      loadDeleteNewsList();
+    } catch (error) {
+      console.error("Ошибка удаления:", error);
+      alert('Ошибка удаления новости');
+    }
   }
 
-  // Image modal
   const imageModal = document.getElementById('imageModal');
   const imageModalImg = document.getElementById('imageModalImg');
   const imageModalClose = document.getElementById('imageModalClose');
 
-  function openImageModal(src) {
+  window.openImageModal = function(src) {
     imageModalImg.src = src;
     imageModal.classList.add('active');
   }
