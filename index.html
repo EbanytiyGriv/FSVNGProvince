@@ -137,6 +137,9 @@
     text-transform: uppercase; color: var(--amber); text-align: center;
     margin-bottom: 22px;
   }
+  .form-captcha-wrap{
+    display: flex; justify-content: center; margin: 22px 0;
+  }
   .form-submit-btn{
     width: 100%; background: var(--amber); color: #14150e; border: none;
     font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em;
@@ -1278,19 +1281,24 @@
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
+  // Значения ниже закодированы через base64 — так URL/ключи не видны прямым текстом
+  // при беглом просмотре исходного кода страницы. Это не настоящее шифрование
+  // (base64 обратим), но скрывает данные от случайного копирования.
+  const _b = s => atob(s);
+
   const firebaseConfig = {
-    apiKey: "AIzaSyDyUq4ZbaqUs8cymDUMdn8eR_xD3Kzl5AU",
-    authDomain: "dfgdfg-95a47.firebaseapp.com",
-    projectId: "dfgdfg-95a47",
-    storageBucket: "dfgdfg-95a47.firebasestorage.app",
-    messagingSenderId: "333443743771",
-    appId: "1:333443743771:web:2b8e06cd851dd6ada638be"
+    apiKey: _b("QUl6YVN5RHlVcTRaYmFxVXM4Y3ltRFVNZG44ZVJfeEQzS3psNUFV"),
+    authDomain: _b("ZGZnZGZnLTk1YTQ3LmZpcmViYXNlYXBwLmNvbQ=="),
+    projectId: _b("ZGZnZGZnLTk1YTQ3"),
+    storageBucket: _b("ZGZnZGZnLTk1YTQ3LmZpcmViYXNlc3RvcmFnZS5hcHA="),
+    messagingSenderId: _b("MzMzNDQzNzQzNzcx"),
+    appId: _b("MTozMzM0NDM3NDM3NzE6d2ViOjJiOGUwNmNkODUxZGQ2YWRhNjM4YmU=")
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const ADMIN_CODE = 'Privet';
+  const ADMIN_CODE = _b("UHJpdmV0");
 
   const yearSpan = document.getElementById('currentYear');
   if (yearSpan) {
@@ -1301,8 +1309,13 @@
   });
 
   /* ==================== АНКЕТА НАБОРА ==================== */
-  const RECRUIT_WEBHOOK_URL = 'https://discord.com/api/webhooks/1542844452484415550/ltkO8yVUuVRXtIQ8_n6W4v6jHFTau-jzGWC97qG9kuxV_itTZOmPrgjz3w53H9Cbc3Yh';
+  const RECRUIT_WEBHOOK_URL = _b("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTU0Mjg0NDQ1MjQ4NDQxNTU1MC9sdGtPOHlWVXVWUlh0SVE4X242VzR2NmpIRlRhdS1qekdXQzk3cUc5a3V4Vl9pdFRaT21QcmdqejN3NTNIOUNiYzNZaA==");
   const RECRUIT_BANNER_URL = 'https://cdn.discordapp.com/attachments/1523393186758656052/1542851869213196298/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFcw740.png?ex=6a92bc46&is=6a916ac6&hm=a1c94caf8aedfdf6727919b3463c81e659e95f7cb1b4697a107050937cd0f955&';
+
+  // Site key reCAPTCHA — этот ключ, в отличие от секретного, изначально
+  // предназначен быть публичным (он передаётся в браузер пользователя для
+  // отображения виджета), поэтому обфускация тут скорее для единообразия.
+  const RECAPTCHA_SITE_KEY = _b("Nkxja0Y1MHRBQUFBQUNhQXkzdUF1Q1dUNjdILU42LXBwN0hxWGNQQg==");
 
   const recruitQuestions = [
     { type: 'text', label: 'Ваш юзернейм в дискорде.' },
@@ -1375,6 +1388,7 @@
       html += `</div>`;
     });
 
+    html += `<div class="form-captcha-wrap"><div id="recruitCaptcha"></div></div>`;
     html += `<button type="submit" class="form-submit-btn" id="recruitSubmitBtn">Отправить</button>`;
     html += `<div class="form-message" id="recruitFormMessage" style="display:none;"></div>`;
     html += `</form>`;
@@ -1401,12 +1415,39 @@
     });
 
     document.getElementById('recruitForm').addEventListener('submit', handleRecruitSubmit);
+
+    // виджет reCAPTCHA нужно рендерить вручную: форма создаётся динамически
+    // уже после того, как api.js один раз просканировал страницу при загрузке
+    renderRecruitCaptcha();
+  }
+
+  let recruitCaptchaWidgetId = null;
+
+  function renderRecruitCaptcha() {
+    const container = document.getElementById('recruitCaptcha');
+    if (!container) return;
+
+    const tryRender = () => {
+      if (typeof grecaptcha === 'undefined' || !grecaptcha.render) {
+        setTimeout(tryRender, 200);
+        return;
+      }
+      recruitCaptchaWidgetId = grecaptcha.render(container, { sitekey: RECAPTCHA_SITE_KEY });
+    };
+    tryRender();
   }
 
   async function handleRecruitSubmit(e) {
     e.preventDefault();
     const submitBtn = document.getElementById('recruitSubmitBtn');
     const msgEl = document.getElementById('recruitFormMessage');
+
+    // проверка капчи
+    if (typeof grecaptcha === 'undefined' || !grecaptcha.getResponse(recruitCaptchaWidgetId)) {
+      msgEl.textContent = 'Подтвердите, что вы не робот (капча внизу формы).';
+      msgEl.style.display = 'block';
+      return;
+    }
 
     submitBtn.disabled = true;
 
@@ -1441,6 +1482,7 @@
       recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
     } catch (err) {
       console.error('Ошибка отправки анкеты:', err);
+      if (typeof grecaptcha !== 'undefined') grecaptcha.reset(recruitCaptchaWidgetId);
       msgEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз.';
       msgEl.style.display = 'block';
       submitBtn.disabled = false;
@@ -1938,6 +1980,8 @@
 
   renderStaff();
 </script>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
 </html>
