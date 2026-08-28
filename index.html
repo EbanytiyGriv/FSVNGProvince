@@ -88,6 +88,68 @@
     text-transform: uppercase; letter-spacing:.03em; color: var(--khaki);
   }
 
+  /* ---------- анкета набора ---------- */
+  .recruit-form-wrap{
+    max-width: 640px; margin: 0 auto; width: 100%;
+    text-align: left; padding: 20px 4px 10px;
+  }
+  .recruit-banner{
+    display: block; max-width: 100%; margin: 0 auto;
+    border: 1px solid var(--line);
+  }
+  .form-question-box{
+    border: 1px solid var(--line); background: var(--panel);
+    padding: 20px 22px; margin-bottom: 18px;
+  }
+  .form-question-label{
+    color: var(--bone); font-size: .96rem; margin-bottom: 14px; line-height: 1.5;
+  }
+  .form-answer-input{
+    width: 100%; background: transparent; border: none;
+    border-bottom: 1px solid var(--khaki-dim);
+    color: var(--bone); font-family: var(--font-body); font-size: .92rem;
+    padding: 6px 2px 8px; resize: none; overflow: hidden;
+    min-height: 30px;
+    transition: border-color .15s;
+  }
+  .form-answer-input:focus{ outline: none; border-color: var(--amber); }
+  .form-choice-list{
+    display: flex; flex-direction: column; gap: 12px; margin-top: 4px;
+  }
+  .form-choice-option{
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+  }
+  .form-choice-circle{
+    width: 18px; height: 18px; flex: none; border-radius: 50%;
+    border: 1.5px solid var(--khaki-dim); position: relative;
+    transition: border-color .15s;
+  }
+  .form-choice-option.selected .form-choice-circle{ border-color: var(--amber); }
+  .form-choice-option.selected .form-choice-circle::after{
+    content: ''; position: absolute; inset: 3px; border-radius: 50%;
+    background: var(--amber);
+  }
+  .form-choice-text{ color: var(--khaki); font-size: .92rem; }
+  .form-choice-option.selected .form-choice-text{ color: var(--bone); }
+  .form-divider{ height: 1px; background: var(--line); margin: 36px 0 20px; }
+  .form-section-label{
+    font-family: var(--font-mono); font-size: .76rem; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--amber); text-align: center;
+    margin-bottom: 22px;
+  }
+  .form-submit-btn{
+    width: 100%; background: var(--amber); color: #14150e; border: none;
+    font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em;
+    text-transform: uppercase; padding: 14px; cursor: pointer;
+    transition: opacity .2s; margin-top: 8px;
+  }
+  .form-submit-btn:hover{ opacity: .85; }
+  .form-submit-btn:disabled{ opacity: .5; cursor: not-allowed; }
+  .form-message{
+    margin-top: 18px; padding: 14px; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--khaki); font-size: .88rem; text-align: center;
+  }
+
   .nav{
     position: sticky; top:0; z-index:40;
     display:flex; justify-content:center; gap: 38px;
@@ -1085,8 +1147,8 @@
 
 <div class="page-recruit" id="pageRecruit">
   <button class="recruit-back" id="recruitBackBtn">← Назад</button>
-  <div class="recruit-content">
-    <div class="recruit-status">В разработке</div>
+  <div class="recruit-content" id="recruitContent" style="display:block; text-align:center;">
+    <div class="recruit-status">Загрузка...</div>
   </div>
   <footer style="background-color: var(--bg); padding: 40px 20px; width: 100%; box-sizing: border-box; font-family: sans-serif; border-top: 1px solid var(--line);">
     <div style="text-align: center; color: #888888; font-size: 13px; line-height: 1.6; margin-bottom: 25px;">
@@ -1159,6 +1221,7 @@
       <div class="admin-tabs">
         <button class="admin-tab-btn active" data-tab="create">Выпуск публикации</button>
         <button class="admin-tab-btn" data-tab="delete">Убрать публикацию</button>
+        <button class="admin-tab-btn" data-tab="recruitment">Набор</button>
       </div>
 
       <div class="admin-tab-content active" id="tabCreate">
@@ -1187,6 +1250,19 @@
           <div class="delete-news-empty">Загрузка...</div>
         </div>
       </div>
+
+      <div class="admin-tab-content" id="tabRecruitment">
+        <div class="admin-form">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Текущий статус набора</label>
+            <div id="recruitmentStatusText" style="color: var(--bone); font-family: var(--font-display); font-size: 1.3rem; text-transform: uppercase;">—</div>
+          </div>
+          <div style="display:flex; gap: 14px; flex-wrap: wrap;">
+            <button type="button" id="recruitmentOpenBtn" class="admin-form-submit" style="flex:1;">Открыть набор</button>
+            <button type="button" id="recruitmentCloseBtn" class="admin-form-submit" style="flex:1; background: var(--brick); color: var(--bone);">Закрыть набор</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1199,7 +1275,7 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyDyUq4ZbaqUs8cymDUMdn8eR_xD3Kzl5AU",
@@ -1223,10 +1299,168 @@
     el.textContent = new Date().getFullYear();
   });
 
+  /* ==================== АНКЕТА НАБОРА ==================== */
+  const RECRUIT_WEBHOOK_URL = 'https://discord.com/api/webhooks/1542844452484415550/ltkO8yVUuVRXtIQ8_n6W4v6jHFTau-jzGWC97qG9kuxV_itTZOmPrgjz3w53H9Cbc3Yh';
+  const RECRUIT_BANNER_URL = 'https://docs.google.com/forms-images-rt/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFc=w740';
+
+  const recruitQuestions = [
+    { type: 'text', label: 'Ваш юзернейм в дискорде.' },
+    { type: 'text', label: 'Ваш юзернейм в роблоксе.' },
+    { type: 'text', label: 'Ваше имя.' },
+    { type: 'text', label: 'Ваш возраст.' },
+    { type: 'text', label: 'Ваш часовой пояс.' },
+    { type: 'text', label: 'Сколько времени готовы уделять фракции?' },
+    {
+      type: 'choice',
+      label: 'В какое подразделение хотите? (ОВО, ОМОН "Бастион", СОБР "Рысь", ОСН "Гром", ДЧ, ОСБ), при поступлении в СОБР "Рысь", ОСН "Гром" переходите к ним на сервер.',
+      options: ['ОВО', 'ОМОН "Бастион"', 'СОБР "Рысь"', 'ОСН "Гром"', 'ДЧ', 'ОСБ']
+    },
+    { type: 'text', label: 'Ваше ФИО.', sectionBreak: true },
+    { type: 'text', label: 'Ваша дата рождения ("ХХ.ХХ.ХХХХ").' },
+    { type: 'text', label: 'Ваше место рождения' },
+    { type: 'text', label: 'Место проживания или временной регистрации.' },
+    { type: 'text', label: 'Ваша биография (не менее 5 предложений).' }
+  ];
+
+  const recruitAnswers = {};
+
+  const recruitContentEl = document.getElementById('recruitContent');
+
+  async function getRecruitStatus() {
+    try {
+      const snap = await getDoc(doc(db, 'settings', 'recruitment'));
+      if (snap.exists() && snap.data().open === false) return false;
+      return true;
+    } catch (e) {
+      console.error('Ошибка проверки статуса набора:', e);
+      return true;
+    }
+  }
+
+  function renderRecruitClosed() {
+    recruitContentEl.style.display = 'block';
+    recruitContentEl.style.textAlign = 'center';
+    recruitContentEl.innerHTML = '<div class="recruit-status">Набор закрыт</div>';
+  }
+
+  function renderRecruitForm() {
+    recruitContentEl.style.display = 'block';
+    recruitContentEl.style.textAlign = 'center';
+
+    let html = `<img class="recruit-banner" src="${RECRUIT_BANNER_URL}" alt="Анкета набора">`;
+    html += `<form class="recruit-form-wrap" id="recruitForm">`;
+
+    recruitQuestions.forEach((q, i) => {
+      if (q.sectionBreak) {
+        html += `<div class="form-divider"></div><div class="form-section-label">IC часть анкеты</div>`;
+      }
+
+      html += `<div class="form-question-box">`;
+      html += `<div class="form-question-label">${q.label}</div>`;
+
+      if (q.type === 'choice') {
+        html += `<div class="form-choice-list" data-qindex="${i}">`;
+        q.options.forEach((opt, oi) => {
+          html += `<div class="form-choice-option" data-qindex="${i}" data-value="${opt.replace(/"/g, '&quot;')}">
+            <div class="form-choice-circle"></div>
+            <div class="form-choice-text">${opt}</div>
+          </div>`;
+        });
+        html += `</div>`;
+      } else {
+        html += `<textarea class="form-answer-input" data-qindex="${i}" rows="1" placeholder="Ответ"></textarea>`;
+      }
+
+      html += `</div>`;
+    });
+
+    html += `<button type="submit" class="form-submit-btn" id="recruitSubmitBtn">Отправить</button>`;
+    html += `<div class="form-message" id="recruitFormMessage" style="display:none;"></div>`;
+    html += `</form>`;
+
+    recruitContentEl.innerHTML = html;
+
+    // автоувеличение текстовых полей
+    recruitContentEl.querySelectorAll('.form-answer-input').forEach(ta => {
+      ta.addEventListener('input', () => {
+        recruitAnswers[ta.dataset.qindex] = ta.value;
+        ta.style.height = 'auto';
+        ta.style.height = ta.scrollHeight + 'px';
+      });
+    });
+
+    // выбор варианта (кружок)
+    recruitContentEl.querySelectorAll('.form-choice-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const qi = opt.dataset.qindex;
+        recruitContentEl.querySelectorAll(`.form-choice-option[data-qindex="${qi}"]`).forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        recruitAnswers[qi] = opt.dataset.value;
+      });
+    });
+
+    document.getElementById('recruitForm').addEventListener('submit', handleRecruitSubmit);
+  }
+
+  async function handleRecruitSubmit(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('recruitSubmitBtn');
+    const msgEl = document.getElementById('recruitFormMessage');
+
+    submitBtn.disabled = true;
+
+    // повторная проверка статуса набора перед отправкой — чтобы закрытый набор
+    // нельзя было обойти через локальное изменение страницы
+    const stillOpen = await getRecruitStatus();
+    if (!stillOpen) {
+      renderRecruitClosed();
+      return;
+    }
+
+    let description = '';
+    recruitQuestions.forEach((q, i) => {
+      const answer = (recruitAnswers[i] || '').toString().trim() || '—';
+      description += `**${i + 1}. ${q.label}**\n${answer}\n\n`;
+    });
+
+    try {
+      await fetch(RECRUIT_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [{
+            title: 'Новая заявка',
+            description: description.slice(0, 4090),
+            color: 0xE0A458,
+            timestamp: new Date().toISOString()
+          }]
+        })
+      });
+
+      recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
+    } catch (err) {
+      console.error('Ошибка отправки анкеты:', err);
+      msgEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз.';
+      msgEl.style.display = 'block';
+      submitBtn.disabled = false;
+    }
+  }
+
+  async function openRecruitPage() {
+    document.body.classList.add('recruit-open');
+    recruitContentEl.innerHTML = '<div class="recruit-status">Загрузка...</div>';
+    const isOpen = await getRecruitStatus();
+    if (isOpen) {
+      renderRecruitForm();
+    } else {
+      renderRecruitClosed();
+    }
+  }
+
   const recruitBtn = document.getElementById('recruitBtn');
   const recruitBackBtn = document.getElementById('recruitBackBtn');
   if (recruitBtn) {
-    recruitBtn.addEventListener('click', () => document.body.classList.add('recruit-open'));
+    recruitBtn.addEventListener('click', openRecruitPage);
   }
   if (recruitBackBtn) {
     recruitBackBtn.addEventListener('click', () => document.body.classList.remove('recruit-open'));
@@ -1312,8 +1546,34 @@
       if (tabName === 'delete') {
         loadDeleteNewsList();
       }
+      if (tabName === 'recruitment') {
+        refreshRecruitmentStatusUI();
+      }
     });
   });
+
+  async function refreshRecruitmentStatusUI() {
+    const statusEl = document.getElementById('recruitmentStatusText');
+    statusEl.textContent = '...';
+    const isOpen = await getRecruitStatus();
+    statusEl.textContent = isOpen ? 'Открыт' : 'Закрыт';
+    statusEl.style.color = isOpen ? 'var(--amber)' : 'var(--brick)';
+  }
+
+  const recruitmentOpenBtn = document.getElementById('recruitmentOpenBtn');
+  const recruitmentCloseBtn = document.getElementById('recruitmentCloseBtn');
+  if (recruitmentOpenBtn) {
+    recruitmentOpenBtn.addEventListener('click', async () => {
+      await setDoc(doc(db, 'settings', 'recruitment'), { open: true }, { merge: true });
+      refreshRecruitmentStatusUI();
+    });
+  }
+  if (recruitmentCloseBtn) {
+    recruitmentCloseBtn.addEventListener('click', async () => {
+      await setDoc(doc(db, 'settings', 'recruitment'), { open: false }, { merge: true });
+      refreshRecruitmentStatusUI();
+    });
+  }
 
   const newsImage = document.getElementById('newsImage');
   const newsImageName = document.getElementById('newsImageName');
