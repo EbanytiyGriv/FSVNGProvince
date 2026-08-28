@@ -1332,7 +1332,7 @@
       if (snap.exists() && snap.data().open === false) return false;
       return true;
     } catch (e) {
-      console.error('Ошибка проверки статуса набора:', e);
+      console.error('Ошибка проверки статуса набора (возможно, не хватает прав на чтение settings/recruitment):', e);
       return true;
     }
   }
@@ -1564,13 +1564,27 @@
   const recruitmentCloseBtn = document.getElementById('recruitmentCloseBtn');
   if (recruitmentOpenBtn) {
     recruitmentOpenBtn.addEventListener('click', async () => {
-      await setDoc(doc(db, 'settings', 'recruitment'), { open: true }, { merge: true });
+      const statusEl = document.getElementById('recruitmentStatusText');
+      statusEl.textContent = 'Сохраняется...';
+      try {
+        await setDoc(doc(db, 'settings', 'recruitment'), { open: true }, { merge: true });
+      } catch (err) {
+        console.error('Ошибка открытия набора:', err);
+        alert('Не удалось изменить статус набора: ' + err.message);
+      }
       refreshRecruitmentStatusUI();
     });
   }
   if (recruitmentCloseBtn) {
     recruitmentCloseBtn.addEventListener('click', async () => {
-      await setDoc(doc(db, 'settings', 'recruitment'), { open: false }, { merge: true });
+      const statusEl = document.getElementById('recruitmentStatusText');
+      statusEl.textContent = 'Сохраняется...';
+      try {
+        await setDoc(doc(db, 'settings', 'recruitment'), { open: false }, { merge: true });
+      } catch (err) {
+        console.error('Ошибка закрытия набора:', err);
+        alert('Не удалось изменить статус набора: ' + err.message);
+      }
       refreshRecruitmentStatusUI();
     });
   }
