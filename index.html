@@ -1428,11 +1428,11 @@
     if (!container) return;
 
     const tryRender = () => {
-      if (typeof grecaptcha === 'undefined' || !grecaptcha.render) {
+      if (typeof grecaptcha === 'undefined' || !grecaptcha.enterprise || !grecaptcha.enterprise.render) {
         setTimeout(tryRender, 200);
         return;
       }
-      recruitCaptchaWidgetId = grecaptcha.render(container, { sitekey: RECAPTCHA_SITE_KEY });
+      recruitCaptchaWidgetId = grecaptcha.enterprise.render(container, { sitekey: RECAPTCHA_SITE_KEY });
     };
     tryRender();
   }
@@ -1443,7 +1443,7 @@
     const msgEl = document.getElementById('recruitFormMessage');
 
     // проверка капчи
-    if (typeof grecaptcha === 'undefined' || !grecaptcha.getResponse(recruitCaptchaWidgetId)) {
+    if (typeof grecaptcha === 'undefined' || !grecaptcha.enterprise || !grecaptcha.enterprise.getResponse(recruitCaptchaWidgetId)) {
       msgEl.textContent = 'Подтвердите, что вы не робот (капча внизу формы).';
       msgEl.style.display = 'block';
       return;
@@ -1482,7 +1482,7 @@
       recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
     } catch (err) {
       console.error('Ошибка отправки анкеты:', err);
-      if (typeof grecaptcha !== 'undefined') grecaptcha.reset(recruitCaptchaWidgetId);
+      if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) grecaptcha.enterprise.reset(recruitCaptchaWidgetId);
       msgEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз.';
       msgEl.style.display = 'block';
       submitBtn.disabled = false;
@@ -1981,7 +1981,7 @@
   renderStaff();
 </script>
 
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
 
 </body>
 </html>
