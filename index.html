@@ -1276,10 +1276,11 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { getFirestore, collection, getDocs, doc, getDoc, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
   let CONFIG = {};
   let db;
+  let adminCode = '';
   let RECRUIT_BANNER_URL = 'https://cdn.discordapp.com/attachments/1523393186758656052/1542851869213196298/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFcw740.png?ex=6a92bc46&is=6a916ac6&hm=a1c94caf8aedfdf6727919b3463c81e659e95f7cb1b4697a107050937cd0f955&';
 
   async function initApp() {
@@ -1500,6 +1501,7 @@
       document.getElementById('adminFormSection').style.display = 'none';
       document.getElementById('adminPassword').value = '';
       document.getElementById('adminLoginError').style.display = 'none';
+      adminCode = '';
     });
   }
 
@@ -1517,8 +1519,8 @@
       }
 
       try {
-        // Проверяем код администратора через сервер
-        const res = await fetch('/api/config', {
+        // Проверяем код администратора через защищённый серверный эндпоинт
+        const res = await fetch('/api/admin', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1529,12 +1531,13 @@
         const data = await res.json();
 
         if (data.authorized) {
+          adminCode = code; // храним код в памяти вкладки, он будет отправляться с каждым действием записи
           document.getElementById('adminLoginSection').style.display = 'none';
           document.getElementById('adminFormSection').style.display = 'block';
           adminLoginError.style.display = 'none';
           loadDeleteNewsList();
         } else {
-          adminLoginError.textContent = 'Неверный код';
+          adminLoginError.textContent = data.error || 'Неверный код';
           adminLoginError.style.display = 'block';
         }
       } catch (err) {
@@ -1575,6 +1578,23 @@
     statusEl.style.color = isOpen ? 'var(--amber)' : 'var(--brick)';
   }
 
+  async function callAdminApi(payload) {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Code': adminCode
+      },
+      body: JSON.stringify(payload)
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      throw new Error(data.error || 'Ошибка запроса');
+    }
+    return data;
+  }
+
   const recruitmentOpenBtn = document.getElementById('recruitmentOpenBtn');
   const recruitmentCloseBtn = document.getElementById('recruitmentCloseBtn');
   if (recruitmentOpenBtn) {
@@ -1582,7 +1602,7 @@
       const statusEl = document.getElementById('recruitmentStatusText');
       statusEl.textContent = 'Сохраняется...';
       try {
-        await setDoc(doc(db, 'settings', 'recruitment'), { open: true }, { merge: true });
+        await callAdminApi({ action: 'setRecruitment', open: true });
       } catch (err) {
         console.error('Ошибка открытия набора:', err);
         alert('Не удалось изменить статус набора: ' + err.message);
@@ -1595,7 +1615,7 @@
       const statusEl = document.getElementById('recruitmentStatusText');
       statusEl.textContent = 'Сохраняется...';
       try {
-        await setDoc(doc(db, 'settings', 'recruitment'), { open: false }, { merge: true });
+        await callAdminApi({ action: 'setRecruitment', open: false });
       } catch (err) {
         console.error('Ошибка закрытия набора:', err);
         alert('Не удалось изменить статус набора: ' + err.message);
@@ -1642,34 +1662,21 @@
         return;
       }
 
-      const newsItem = {
-        text: text,
-        timestamp: serverTimestamp(),
-        time: new Date().toLocaleString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      };
-
       if (file) {
         const reader = new FileReader();
         reader.onload = async (ev) => {
-          newsItem.image = ev.target.result;
-          await saveNews(newsItem);
+          await saveNews(text, ev.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        await saveNews(newsItem);
+        await saveNews(text, null);
       }
     });
   }
 
-  async function saveNews(newsItem) {
+  async function saveNews(text, imageBase64) {
     try {
-      await addDoc(collection(db, 'news'), newsItem);
+      await callAdminApi({ action: 'createNews', text, imageBase64 });
 
       newsForm.reset();
       newsImageName.textContent = 'Файл не выбран';
@@ -1755,11 +1762,11 @@
 
   window.deleteNews = async function(docId) {
     try {
-      await deleteDoc(doc(db, 'news', docId));
+      await callAdminApi({ action: 'deleteNews', docId });
       loadDeleteNewsList();
     } catch (error) {
       console.error("Ошибка удаления:", error);
-      alert('Ошибка удаления новости');
+      alert('Ошибка удаления новости: ' + error.message);
     }
   }
 
