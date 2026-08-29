@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/admin", "destination": "/API/admin.js" },
-    { "source": "/api/config", "destination": "/API/config.js" },
-    { "source": "/api/(.*)", "destination": "/API/$1" }
-  ]
-}
