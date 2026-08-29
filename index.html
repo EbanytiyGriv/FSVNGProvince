@@ -137,9 +137,6 @@
     text-transform: uppercase; color: var(--amber); text-align: center;
     margin-bottom: 22px;
   }
-  .form-captcha-wrap{
-    display: flex; justify-content: center; margin: 22px 0;
-  }
   .form-submit-btn{
     width: 100%; background: var(--amber); color: #14150e; border: none;
     font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em;
@@ -1279,26 +1276,25 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, orderBy, query, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+  import { getFirestore, collection, getDocs, doc, getDoc, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-  // Значения ниже закодированы через base64 — так URL/ключи не видны прямым текстом
-  // при беглом просмотре исходного кода страницы. Это не настоящее шифрование
-  // (base64 обратим), но скрывает данные от случайного копирования.
-  const _b = s => atob(s);
+  let CONFIG = {};
+  let db;
+  let adminCode = '';
+  let RECRUIT_BANNER_URL = 'https://cdn.discordapp.com/attachments/1523393186758656052/1542851869213196298/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFcw740.png?ex=6a92bc46&is=6a916ac6&hm=a1c94caf8aedfdf6727919b3463c81e659e95f7cb1b4697a107050937cd0f955&';
 
-  const firebaseConfig = {
-    apiKey: _b("QUl6YVN5RHlVcTRaYmFxVXM4Y3ltRFVNZG44ZVJfeEQzS3psNUFV"),
-    authDomain: _b("ZGZnZGZnLTk1YTQ3LmZpcmViYXNlYXBwLmNvbQ=="),
-    projectId: _b("ZGZnZGZnLTk1YTQ3"),
-    storageBucket: _b("ZGZnZGZnLTk1YTQ3LmZpcmViYXNlc3RvcmFnZS5hcHA="),
-    messagingSenderId: _b("MzMzNDQzNzQzNzcx"),
-    appId: _b("MTozMzM0NDM3NDM3NzE6d2ViOjJiOGUwNmNkODUxZGQ2YWRhNjM4YmU=")
-  };
+  async function initApp() {
+    try {
+      const res = await fetch('/api/config');
+      CONFIG = await res.json();
+      const app = initializeApp(CONFIG.firebaseConfig);
+      db = getFirestore(app);
+    } catch (e) {
+      console.error('Ошибка инициализации:', e);
+    }
+  }
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const ADMIN_CODE = _b("UHJpdmV0");
+  await initApp();
 
   const yearSpan = document.getElementById('currentYear');
   if (yearSpan) {
@@ -1309,14 +1305,6 @@
   });
 
   /* ==================== АНКЕТА НАБОРА ==================== */
-  const RECRUIT_WEBHOOK_URL = _b("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTU0Mjg0NDQ1MjQ4NDQxNTU1MC9sdGtPOHlWVXVWUlh0SVE4X242VzR2NmpIRlRhdS1qekdXQzk3cUc5a3V4Vl9pdFRaT21QcmdqejN3NTNIOUNiYzNZaA==");
-  const RECRUIT_BANNER_URL = 'https://cdn.discordapp.com/attachments/1523393186758656052/1542851869213196298/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFcw740.png?ex=6a92bc46&is=6a916ac6&hm=a1c94caf8aedfdf6727919b3463c81e659e95f7cb1b4697a107050937cd0f955&';
-
-  // Site key reCAPTCHA — этот ключ, в отличие от секретного, изначально
-  // предназначен быть публичным (он передаётся в браузер пользователя для
-  // отображения виджета), поэтому обфускация тут скорее для единообразия.
-  const RECAPTCHA_SITE_KEY = _b("Nkxja0Y1MHRBQUFBQUNhQXkzdUF1Q1dUNjdILU42LXBwN0hxWGNQQg==");
-
   const recruitQuestions = [
     { type: 'text', label: 'Ваш юзернейм в дискорде.' },
     { type: 'text', label: 'Ваш юзернейм в роблоксе.' },
@@ -1337,7 +1325,6 @@
   ];
 
   const recruitAnswers = {};
-
   const recruitContentEl = document.getElementById('recruitContent');
 
   async function getRecruitStatus() {
@@ -1346,7 +1333,7 @@
       if (snap.exists() && snap.data().open === false) return false;
       return true;
     } catch (e) {
-      console.error('Ошибка проверки статуса набора (возможно, не хватает прав на чтение settings/recruitment):', e);
+      console.error('Ошибка проверки статуса набора:', e);
       return true;
     }
   }
@@ -1388,7 +1375,6 @@
       html += `</div>`;
     });
 
-    html += `<div class="form-captcha-wrap"><div id="recruitCaptcha"></div></div>`;
     html += `<button type="submit" class="form-submit-btn" id="recruitSubmitBtn">Отправить</button>`;
     html += `<div class="form-message" id="recruitFormMessage" style="display:none;"></div>`;
     html += `</form>`;
@@ -1415,26 +1401,6 @@
     });
 
     document.getElementById('recruitForm').addEventListener('submit', handleRecruitSubmit);
-
-    // виджет reCAPTCHA нужно рендерить вручную: форма создаётся динамически
-    // уже после того, как api.js один раз просканировал страницу при загрузке
-    renderRecruitCaptcha();
-  }
-
-  let recruitCaptchaWidgetId = null;
-
-  function renderRecruitCaptcha() {
-    const container = document.getElementById('recruitCaptcha');
-    if (!container) return;
-
-    const tryRender = () => {
-      if (typeof grecaptcha === 'undefined' || !grecaptcha.enterprise || !grecaptcha.enterprise.render) {
-        setTimeout(tryRender, 200);
-        return;
-      }
-      recruitCaptchaWidgetId = grecaptcha.enterprise.render(container, { sitekey: RECAPTCHA_SITE_KEY });
-    };
-    tryRender();
   }
 
   async function handleRecruitSubmit(e) {
@@ -1442,17 +1408,8 @@
     const submitBtn = document.getElementById('recruitSubmitBtn');
     const msgEl = document.getElementById('recruitFormMessage');
 
-    // проверка капчи
-    if (typeof grecaptcha === 'undefined' || !grecaptcha.enterprise || !grecaptcha.enterprise.getResponse(recruitCaptchaWidgetId)) {
-      msgEl.textContent = 'Подтвердите, что вы не робот (капча внизу формы).';
-      msgEl.style.display = 'block';
-      return;
-    }
-
     submitBtn.disabled = true;
 
-    // повторная проверка статуса набора перед отправкой — чтобы закрытый набор
-    // нельзя было обойти через локальное изменение страницы
     const stillOpen = await getRecruitStatus();
     if (!stillOpen) {
       renderRecruitClosed();
@@ -1466,23 +1423,24 @@
     });
 
     try {
-      await fetch(RECRUIT_WEBHOOK_URL, {
+      // Отправляем через серверный endpoint на Vercel
+      const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          embeds: [{
-            title: 'Новая заявка',
-            description: description.slice(0, 4090),
-            color: 0xE0A458,
-            timestamp: new Date().toISOString()
-          }]
+          action: 'submitApplication',
+          formData: {
+            "Текст анкеты": description.slice(0, 4090)
+          }
         })
-      });
 
-      recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
+      if (response.ok) {
+        recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
+      } else {
+        throw new Error('Ошибка отправки');
+      }
     } catch (err) {
       console.error('Ошибка отправки анкеты:', err);
-      if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) grecaptcha.enterprise.reset(recruitCaptchaWidgetId);
       msgEl.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз.';
       msgEl.style.display = 'block';
       submitBtn.disabled = false;
@@ -1544,6 +1502,7 @@
       document.getElementById('adminFormSection').style.display = 'none';
       document.getElementById('adminPassword').value = '';
       document.getElementById('adminLoginError').style.display = 'none';
+      adminCode = '';
     });
   }
 
@@ -1552,7 +1511,7 @@
   const adminLoginError = document.getElementById('adminLoginError');
 
   if (adminLoginBtn) {
-    adminLoginBtn.addEventListener('click', () => {
+    adminLoginBtn.addEventListener('click', async () => {
       const code = adminPassword.value.trim();
       if (!code) {
         adminLoginError.textContent = 'Введите код';
@@ -1560,13 +1519,30 @@
         return;
       }
 
-      if (code === ADMIN_CODE) {
-        document.getElementById('adminLoginSection').style.display = 'none';
-        document.getElementById('adminFormSection').style.display = 'block';
-        adminLoginError.style.display = 'none';
-        loadDeleteNewsList();
-      } else {
-        adminLoginError.textContent = 'Неверный код';
+      try {
+        // Проверяем код администратора через защищённый серверный эндпоинт
+        const res = await fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'checkAdmin',
+            userAdminCode: code
+          })
+        });
+        const data = await res.json();
+
+        if (data.authorized) {
+          adminCode = code; // храним код в памяти вкладки, он будет отправляться с каждым действием записи
+          document.getElementById('adminLoginSection').style.display = 'none';
+          document.getElementById('adminFormSection').style.display = 'block';
+          adminLoginError.style.display = 'none';
+          loadDeleteNewsList();
+        } else {
+          adminLoginError.textContent = data.error || 'Неверный код';
+          adminLoginError.style.display = 'block';
+        }
+      } catch (err) {
+        adminLoginError.textContent = 'Ошибка проверки кода';
         adminLoginError.style.display = 'block';
       }
     });
@@ -1603,6 +1579,23 @@
     statusEl.style.color = isOpen ? 'var(--amber)' : 'var(--brick)';
   }
 
+  async function callAdminApi(payload) {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Code': adminCode
+      },
+      body: JSON.stringify(payload)
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      throw new Error(data.error || 'Ошибка запроса');
+    }
+    return data;
+  }
+
   const recruitmentOpenBtn = document.getElementById('recruitmentOpenBtn');
   const recruitmentCloseBtn = document.getElementById('recruitmentCloseBtn');
   if (recruitmentOpenBtn) {
@@ -1610,7 +1603,7 @@
       const statusEl = document.getElementById('recruitmentStatusText');
       statusEl.textContent = 'Сохраняется...';
       try {
-        await setDoc(doc(db, 'settings', 'recruitment'), { open: true }, { merge: true });
+        await callAdminApi({ action: 'setRecruitment', open: true });
       } catch (err) {
         console.error('Ошибка открытия набора:', err);
         alert('Не удалось изменить статус набора: ' + err.message);
@@ -1623,7 +1616,7 @@
       const statusEl = document.getElementById('recruitmentStatusText');
       statusEl.textContent = 'Сохраняется...';
       try {
-        await setDoc(doc(db, 'settings', 'recruitment'), { open: false }, { merge: true });
+        await callAdminApi({ action: 'setRecruitment', open: false });
       } catch (err) {
         console.error('Ошибка закрытия набора:', err);
         alert('Не удалось изменить статус набора: ' + err.message);
@@ -1670,34 +1663,21 @@
         return;
       }
 
-      const newsItem = {
-        text: text,
-        timestamp: serverTimestamp(),
-        time: new Date().toLocaleString('ru-RU', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      };
-
       if (file) {
         const reader = new FileReader();
         reader.onload = async (ev) => {
-          newsItem.image = ev.target.result;
-          await saveNews(newsItem);
+          await saveNews(text, ev.target.result);
         };
         reader.readAsDataURL(file);
       } else {
-        await saveNews(newsItem);
+        await saveNews(text, null);
       }
     });
   }
 
-  async function saveNews(newsItem) {
+  async function saveNews(text, imageBase64) {
     try {
-      await addDoc(collection(db, 'news'), newsItem);
+      await callAdminApi({ action: 'createNews', text, imageBase64 });
 
       newsForm.reset();
       newsImageName.textContent = 'Файл не выбран';
@@ -1783,11 +1763,11 @@
 
   window.deleteNews = async function(docId) {
     try {
-      await deleteDoc(doc(db, 'news', docId));
+      await callAdminApi({ action: 'deleteNews', docId });
       loadDeleteNewsList();
     } catch (error) {
       console.error("Ошибка удаления:", error);
-      alert('Ошибка удаления новости');
+      alert('Ошибка удаления новости: ' + error.message);
     }
   }
 
@@ -1980,8 +1960,6 @@
 
   renderStaff();
 </script>
-
-<script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
 
 </body>
 </html>
