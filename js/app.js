@@ -21,7 +21,7 @@ const recruitQuestions = [
 ];
 
 const recruitAnswers = {};
-const RECRUIT_BANNER_URL = 'https://cdn.discordapp.com/attachments/1523393186758656052/1542851869213196298/ANbbkijuZpOA6h0Yuzrgi_s9yizPXYszlnsjCz-SUjhdjybug_c2ZJDs5CBZUhipRtGohfAsVC2v4dX1T_KYtzYWG7-JUzyywYyD1cKOfrv0gl_WsP3Un9uYVt3PuSW7znK5ovpXGfJxvKvavsrMFNjleYT0W8VaOj6VIn8g9-BfcLqN09KdmbPTbXhyL2LD4s6ScpsL1UqANKmr9cB2JTJ_wH42jeL5TRKlitynAFcw740.png';
+const RECRUIT_BANNER_URL = 'https://i.ibb.co/39mCMY4N/ANBBKI-1.png';
 
 const recruitContentEl = document.getElementById('recruitContent');
 let currentAdminCode = null;
