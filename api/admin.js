@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 
-const ALLOWED_ORIGIN = process.env.SITE_ORIGIN || 'https://vercel.app';
+const ALLOWED_ORIGIN = process.env.SITE_ORIGIN || 'https://fsvng-province.vercel.app';
 
 let dbInstance = null;
 let bucketInstance = null;
@@ -19,6 +19,9 @@ function initAdmin() {
 }
 
 // Простейший лимит попыток входа в память процесса.
+// Best-effort: сбрасывается при холодном старте инстанса Vercel,
+// поэтому не является полноценной защитой от распределённого перебора.
+// Для надёжной защиты используйте внешний rate-limiter (например, Upstash Redis).
 const loginAttempts = new Map();
 function isRateLimited(ip) {
   const now = Date.now();
@@ -56,7 +59,8 @@ export default async function handler(req, res) {
   const { action } = req.body || {};
 
   try {
-    // Проверка кода — единственное действие без предварительной авторизации
+    // Проверка кода — единственное действие без предварительной авторизации,
+    // но с ограничением частоты попыток.
     if (action === 'checkAdmin') {
       const ip = getClientIp(req);
       if (isRateLimited(ip)) {
@@ -69,7 +73,7 @@ export default async function handler(req, res) {
       return res.status(403).json({ authorized: false, error: 'Неверный код' });
     }
 
-    // Все остальные действия — только с верным кодом в заголовке X-Admin-Code
+    // Все остальные действия — только с верным кодом в заголовке X-Admin-Code.
     if (!isAuthorized(req)) {
       return res.status(403).json({ error: 'Нет доступа' });
     }
@@ -98,7 +102,7 @@ export default async function handler(req, res) {
         const file = bucket.file(fileName);
         await file.save(buffer, { metadata: { contentType: mimeType } });
         await file.makePublic();
-        imageUrl = `https://googleapis.com{bucket.name}/${fileName}`;
+        imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
       }
 
       await db.collection('news').add({
