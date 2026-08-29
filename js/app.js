@@ -21,7 +21,7 @@ const recruitQuestions = [
 ];
 
 const recruitAnswers = {};
-const RECRUIT_BANNER_URL = 'https://i.ibb.co/39mCMY4N/ANBBKI-1.png';
+const RECRUIT_BANNER_URL = 'https://cdn.phototourl.com/free/2026-08-29-1f960f4c-f812-4bfc-8383-b647ef8ce7f0.png';
 
 const recruitContentEl = document.getElementById('recruitContent');
 let currentAdminCode = null;
