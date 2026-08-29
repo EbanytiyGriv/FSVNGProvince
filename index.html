@@ -1424,14 +1424,15 @@
 
     try {
       // Отправляем через серверный endpoint на Vercel
-      const response = await fetch('/api/config', {
+      const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'sendToDiscord',
-          messageText: description.slice(0, 4090)
+          action: 'submitApplication',
+          formData: {
+            "Текст анкеты": description.slice(0, 4090)
+          }
         })
-      });
 
       if (response.ok) {
         recruitContentEl.innerHTML = '<div class="recruit-status" style="font-size:1.8rem;">Заявка отправлена!</div>';
