@@ -6,7 +6,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Build complete'",
+    "build": "mkdir -p public && vercel build",
     "deploy": "vercel --prod"
   },
   "dependencies": {
