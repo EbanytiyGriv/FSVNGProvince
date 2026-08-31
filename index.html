@@ -856,6 +856,8 @@
 </head>
 <body>
 
+<script src="/js/protection.js"></script>
+
 <div class="grain"></div>
 
 <div class="image-modal" id="imageModal">
@@ -871,6 +873,29 @@
   <a href="#staff">Руководство</a>
   <button class="nav-btn" id="newsBtn">Новости</button>
   <button class="nav-btn" id="recruitBtn">Набор</button>
+
+  <div id="authSection" style="margin-left: auto; position: relative;">
+    <button class="nav-btn" id="loginBtn" style="display: none;">Войти</button>
+    <div id="userProfile" style="display: none; cursor: pointer;" tabindex="0">
+      <img id="userAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 1px solid var(--khaki-dim);">
+      <span id="userNick" style="margin-left: 8px; color: var(--bone);"></span>
+    </div>
+    <div id="profileDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--panel); border: 1px solid var(--line); min-width: 220px; z-index: 100; padding: 16px;">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <img id="dropdownAvatar" src="" alt="Avatar" style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--khaki-dim);">
+      </div>
+      <div style="text-align: center; margin-bottom: 4px;">
+        <div id="dropdownNick" style="font-family: var(--font-display); font-size: 1.1rem; color: var(--bone); text-transform: uppercase;"></div>
+      </div>
+      <div style="border-top: 1px solid var(--line); margin: 12px 0; padding-top: 12px;">
+        <div style="font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--khaki-dim); margin-bottom: 6px;">Статус:</div>
+        <div id="dropdownStatus" style="color: var(--khaki); font-size: .88rem; margin-bottom: 12px;"></div>
+        <div style="font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--khaki-dim); margin-bottom: 6px;">Звание:</div>
+        <div id="dropdownRank" style="color: var(--khaki); font-size: .88rem;"></div>
+      </div>
+      <button id="logoutBtn" style="width: 100%; margin-top: 14px; padding: 8px; background: var(--brick); color: var(--bone); border: none; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: opacity .2s;">Выйти</button>
+    </div>
+  </div>
 </nav>
 
 <section class="hero">
@@ -1222,6 +1247,7 @@
         <button class="admin-tab-btn active" data-tab="create">Выпуск публикации</button>
         <button class="admin-tab-btn" data-tab="delete">Убрать публикацию</button>
         <button class="admin-tab-btn" data-tab="recruitment">Набор</button>
+        <button class="admin-tab-btn" data-tab="players">Игроки</button>
       </div>
 
       <div class="admin-tab-content active" id="tabCreate">
@@ -1260,6 +1286,17 @@
           <div style="display:flex; gap: 14px; flex-wrap: wrap;">
             <button type="button" id="recruitmentOpenBtn" class="admin-form-submit" style="flex:1;">Открыть набор</button>
             <button type="button" id="recruitmentCloseBtn" class="admin-form-submit" style="flex:1; background: var(--brick); color: var(--bone);">Закрыть набор</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-tab-content" id="tabPlayers">
+        <div class="admin-form">
+          <div class="admin-form-group">
+            <label class="admin-form-label">Список игроков</label>
+            <div id="playersList" style="margin-top: 20px;">
+              <div style="text-align: center; color: var(--khaki-dim); padding: 40px;">Загрузка...</div>
+            </div>
           </div>
         </div>
       </div>
