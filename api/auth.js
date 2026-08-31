@@ -1,6 +1,6 @@
 // API endpoint для Discord OAuth2 авторизации
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 let db;
 
@@ -80,6 +80,7 @@ export default async function handler(req, res) {
         : `https://cdn.discordapp.com/embed/avatars/${parseInt(discriminator) % 5}.png`;
 
       // Проверяем, существует ли пользователь в базе
+      const { doc, getDoc, setDoc } = await import('firebase/firestore');
       const userDocRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userDocRef);
 
@@ -132,6 +133,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Session ID required' });
       }
 
+      const { doc, getDoc } = await import('firebase/firestore');
       const sessionDoc = await getDoc(doc(db, 'sessions', sessionId));
 
       if (!sessionDoc.exists()) {
