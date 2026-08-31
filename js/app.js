@@ -1,5 +1,13 @@
 // Главный JavaScript файл - безопасная версия без прямого доступа к БД и вебхукам
 
+// Авторизация и сессия
+let currentUser = null;
+let currentSession = null;
+
+// Discord OAuth2 конфигурация
+const DISCORD_CLIENT_ID = '1543983652948410419';
+const DISCORD_REDIRECT_URI = window.location.origin + '/'; // Текущий домен
+
 // Вопросы анкеты набора
 const recruitQuestions = [
   { type: 'text', label: 'Ваш юзернейм в дискорде.' },
@@ -25,6 +33,121 @@ const RECRUIT_BANNER_URL = 'https://cdn.phototourl.com/free/2026-08-29-1f960f4c-
 
 const recruitContentEl = document.getElementById('recruitContent');
 let currentAdminCode = null;
+
+/* ==================== АВТОРИЗАЦИЯ ==================== */
+async function initAuth() {
+  // Проверяем, есть ли код авторизации в URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+
+  if (code) {
+    // Обмениваем код на сессию
+    try {
+      const response = await fetch(`/api/auth?code=${code}`);
+      const data = await response.json();
+
+      if (data.sessionId) {
+        localStorage.setItem('sessionId', data.sessionId);
+        currentSession = data.sessionId;
+        currentUser = data.user;
+        updateAuthUI();
+
+        // Очищаем URL от кода
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+    }
+  } else {
+    // Проверяем существующую сессию
+    const sessionId = localStorage.getItem('sessionId');
+    if (sessionId) {
+      try {
+        const response = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          currentSession = sessionId;
+          currentUser = data.user;
+          updateAuthUI();
+        } else {
+          localStorage.removeItem('sessionId');
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+        localStorage.removeItem('sessionId');
+      }
+    }
+  }
+
+  // Показываем кнопку входа, если не авторизованы
+  if (!currentUser) {
+    document.getElementById('loginBtn').style.display = 'inline-block';
+  }
+}
+
+function updateAuthUI() {
+  const loginBtn = document.getElementById('loginBtn');
+  const userProfile = document.getElementById('userProfile');
+  const userAvatar = document.getElementById('userAvatar');
+  const userNick = document.getElementById('userNick');
+  const dropdownAvatar = document.getElementById('dropdownAvatar');
+  const dropdownNick = document.getElementById('dropdownNick');
+  const dropdownStatus = document.getElementById('dropdownStatus');
+  const dropdownRank = document.getElementById('dropdownRank');
+
+  if (currentUser) {
+    loginBtn.style.display = 'none';
+    userProfile.style.display = 'inline-block';
+
+    const displayName = currentUser.username + (currentUser.discriminator !== '0' ? '#' + currentUser.discriminator : '');
+
+    userAvatar.src = currentUser.avatar;
+    userNick.textContent = displayName;
+    dropdownAvatar.src = currentUser.avatar;
+    dropdownNick.textContent = displayName;
+    dropdownStatus.textContent = currentUser.status || 'Пользователь';
+    dropdownRank.textContent = currentUser.rank || 'Без звания';
+  } else {
+    loginBtn.style.display = 'inline-block';
+    userProfile.style.display = 'none';
+  }
+}
+
+function loginWithDiscord() {
+  const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}&response_type=code&scope=identify`;
+  window.location.href = authUrl;
+}
+
+function logout() {
+  localStorage.removeItem('sessionId');
+  currentSession = null;
+  currentUser = null;
+  updateAuthUI();
+  document.getElementById('profileDropdown').style.display = 'none';
+}
+
+// Обработка клика по профилю
+document.getElementById('userProfile')?.addEventListener('click', () => {
+  const dropdown = document.getElementById('profileDropdown');
+  dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+});
+
+// Закрытие дропдауна при клике вне его
+document.addEventListener('click', (e) => {
+  const userProfile = document.getElementById('userProfile');
+  const dropdown = document.getElementById('profileDropdown');
+  if (!userProfile?.contains(e.target) && !dropdown?.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+
+document.getElementById('loginBtn')?.addEventListener('click', loginWithDiscord);
+document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
 // Год в футере
 const yearSpan = document.getElementById('currentYear');
@@ -262,6 +385,129 @@ window.deleteNews = async function(docId) {
   }
 }
 
+/* ==================== УПРАВЛЕНИЕ ИГРОКАМИ ==================== */
+async function loadPlayersList() {
+  const playersList = document.getElementById('playersList');
+  playersList.innerHTML = '<div style="text-align: center; color: var(--khaki-dim); padding: 40px;">Загрузка...</div>';
+
+  try {
+    const response = await fetch('/api/users', {
+      headers: { 'Authorization': currentSession }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to load users');
+    }
+
+    const data = await response.json();
+    const users = data.users || [];
+
+    if (users.length === 0) {
+      playersList.innerHTML = '<div style="text-align: center; color: var(--khaki-dim); padding: 40px;">Нет зарегистрированных игроков</div>';
+      return;
+    }
+
+    playersList.innerHTML = users.map(user => {
+      const displayName = user.username + (user.discriminator !== '0' ? '#' + user.discriminator : '');
+      return `
+        <div class="player-item" style="border: 1px solid var(--line); background: var(--panel-2); padding: 16px; margin-bottom: 14px; cursor: pointer; transition: border-color .2s;" onclick="openPlayerEditor('${user.id}')">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <img src="${user.avatar}" alt="${displayName}" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--khaki-dim);">
+            <div style="flex: 1;">
+              <div style="font-family: var(--font-display); font-size: 1.1rem; color: var(--bone); text-transform: uppercase;">${displayName}</div>
+              <div style="font-size: .84rem; color: var(--khaki); margin-top: 4px;">
+                Статус: ${user.status} • Звание: ${user.rank}
+              </div>
+            </div>
+            ${user.isAdmin ? '<div style="font-family: var(--font-mono); font-size: .7rem; color: var(--amber); text-transform: uppercase; border: 1px solid var(--amber); padding: 4px 8px;">Админ</div>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Error loading players:', error);
+    playersList.innerHTML = '<div style="text-align: center; color: var(--brick); padding: 40px;">Ошибка загрузки списка игроков</div>';
+  }
+}
+
+window.openPlayerEditor = function(userId) {
+  // Создаем модальное окно редактирования
+  const modal = document.createElement('div');
+  modal.id = 'playerEditorModal';
+  modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center;';
+
+  fetch('/api/users', {
+    headers: { 'Authorization': currentSession }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const user = data.users.find(u => u.id === userId);
+    if (!user) return;
+
+    const displayName = user.username + (user.discriminator !== '0' ? '#' + user.discriminator : '');
+
+    modal.innerHTML = `
+      <div style="background: var(--panel); border: 1px solid var(--line); padding: 30px; max-width: 500px; width: 90%;">
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
+          <img src="${user.avatar}" alt="${displayName}" style="width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--khaki-dim);">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--bone); text-transform: uppercase;">${displayName}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-family: var(--font-mono); font-size: .74rem; letter-spacing: .15em; text-transform: uppercase; color: var(--khaki); margin-bottom: 10px;">Статус</label>
+          <input type="text" id="editStatus" value="${user.status}" style="width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--bone); font-family: var(--font-body); font-size: .92rem; padding: 12px 14px;">
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-family: var(--font-mono); font-size: .74rem; letter-spacing: .15em; text-transform: uppercase; color: var(--khaki); margin-bottom: 10px;">Звание</label>
+          <input type="text" id="editRank" value="${user.rank}" style="width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--bone); font-family: var(--font-body); font-size: .92rem; padding: 12px 14px;">
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button onclick="savePlayerChanges('${userId}')" style="flex: 1; background: var(--amber); color: #14150e; border: none; font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; padding: 14px; cursor: pointer;">Сохранить</button>
+          <button onclick="closePlayerEditor()" style="flex: 1; background: var(--panel-2); color: var(--khaki); border: 1px solid var(--line); font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; padding: 14px; cursor: pointer;">Отмена</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+  });
+};
+
+window.closePlayerEditor = function() {
+  const modal = document.getElementById('playerEditorModal');
+  if (modal) modal.remove();
+};
+
+window.savePlayerChanges = async function(userId) {
+  const status = document.getElementById('editStatus').value.trim();
+  const rank = document.getElementById('editRank').value.trim();
+
+  try {
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': currentSession
+      },
+      body: JSON.stringify({ userId, status, rank })
+    });
+
+    if (response.ok) {
+      closePlayerEditor();
+      loadPlayersList();
+      alert('Изменения сохранены!');
+    } else {
+      alert('Ошибка сохранения изменений');
+    }
+  } catch (error) {
+    console.error('Save error:', error);
+    alert('Ошибка сохранения изменений');
+  }
+};
+
 /* ==================== ПЕРСОНАЛ ==================== */
 const staffData = [
   {
@@ -439,6 +685,9 @@ document.querySelectorAll('.admin-tab-btn').forEach(btn => {
     }
     if (tabName === 'recruitment') {
       refreshRecruitmentStatusUI();
+    }
+    if (tabName === 'players') {
+      loadPlayersList();
     }
   });
 });
@@ -637,3 +886,4 @@ imageModal.addEventListener('click', (e) => {
 
 // Инициализация
 renderStaff();
+initAuth();
