@@ -6,7 +6,7 @@ let currentSession = null;
 
 // Discord OAuth2 конфигурация
 const DISCORD_CLIENT_ID = '1543983652948410419';
-const DISCORD_REDIRECT_URI = 'https://fsvng-province.vercel.app/'; // Точный URL с слешем
+const DISCORD_REDIRECT_URI = 'https://fsvng-province.vercel.app'; // Без слеша в конце
 
 // Вопросы анкеты набора
 const recruitQuestions = [
